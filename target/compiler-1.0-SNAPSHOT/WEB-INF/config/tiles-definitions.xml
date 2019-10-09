@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="windows-1251" ?>
+<!DOCTYPE tiles-definitions PUBLIC
+        "-//Apache Software Foundation//DTD Tiles Configuration 1.1//EN"
+        "http://jakarta.apache.org/struts/dtds/tiles-config_1_1.dtd">
+
+<tiles-definitions>
+    <definition name="main" path="/WEB-INF/jsp/main.jsp">
+        <put type="string" name="title" value="Compiler"/>
+        <put type="page" name="header" value="/WEB-INF/jsp/header.jsp"/>
+        <put type="page" name="body" value="/WEB-INF/jsp/body.jsp"/>
+        <put type="page" name="footer" value="/WEB-INF/jsp/footer.jsp"/>
+    </definition>
+</tiles-definitions>
