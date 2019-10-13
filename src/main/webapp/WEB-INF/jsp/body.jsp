@@ -7,12 +7,15 @@
 
     </head>
     <body>
-        <div class="rq">
-        <html:textarea property="code"></html:textarea>
+    <div class="rq">
+        <html:textarea property="request"/>
         <html:submit onclick="">SEND</html:submit>
-        </div>
-        <div class="rs">
-        <html:textarea property="code"></html:textarea>
-        </div>
+    </div>
+    <div class="rq">
+        <html:textarea property="vars"/>
+    </div>
+    <div class="rs">
+        <html:textarea property="response"/>
+    </div>
     </body>
 </html:html>

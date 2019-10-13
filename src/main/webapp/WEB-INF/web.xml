@@ -17,6 +17,10 @@
 
     <servlet-mapping>
         <servlet-name>action</servlet-name>
-        <url-pattern>Online-Compiler/*</url-pattern>
+        <url-pattern>*.do</url-pattern>
     </servlet-mapping>
+
+    <welcome-file-list>
+        <welcome-file>/WEB-INF/jsp/compiler.jsp</welcome-file>
+    </welcome-file-list>
 </web-app>
