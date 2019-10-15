@@ -57,7 +57,7 @@ class Runner {
 
     private String getClassName(String code) {
         StringBuilder className = new StringBuilder();
-        int indexOfStartClassName = code.indexOf("class ") + 5;
+        int indexOfStartClassName = code.indexOf("class ") + 5;//TODO если текст пустой
 
         while (code.charAt(indexOfStartClassName) == ' ')
             indexOfStartClassName++;
