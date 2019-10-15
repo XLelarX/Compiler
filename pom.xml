@@ -13,17 +13,14 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.eclipse.jetty</groupId>
-                <artifactId>jetty-maven-plugin</artifactId>
-                <version>9.4.15.v20190215</version>
+                <groupId>org.wildfly.plugins</groupId>
+                <artifactId>wildfly-maven-plugin</artifactId>
                 <configuration>
-                    <!--<scanIntervalSeconds>10</scanIntervalSeconds>-->
-                    <httpConnector>
-                        <port>9999</port>
-                    </httpConnector>
-                    <!--<webApp>-->
-                    <!--<contextPath>/user-system</contextPath>-->
-                    <!--</webApp>-->
+                    <hostname>localhost</hostname>
+                    <port>9990</port>
+                    <username>Lelar</username>
+                    <password>Dolinok1</password>
+                    <name>compiler.war</name>
                 </configuration>
             </plugin>
         </plugins>
@@ -35,6 +32,13 @@
     </properties>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.wildfly.plugins/wildfly-maven-plugin -->
+        <dependency>
+            <groupId>org.wildfly.plugins</groupId>
+            <artifactId>wildfly-maven-plugin</artifactId>
+            <version>2.0.1.Final</version>
+        </dependency>
+
         <dependency>
             <groupId>struts</groupId>
             <artifactId>struts</artifactId>
