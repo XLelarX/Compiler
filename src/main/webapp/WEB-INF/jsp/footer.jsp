@@ -3,6 +3,6 @@
 <head>
 </head>
 <body>
-    <div class="footer">FOOTER</div>
+    <div class="footer">®2019 Lelar</div>
 </body>
 </html>

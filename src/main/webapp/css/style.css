@@ -1,14 +1,81 @@
 .page {
     margin: auto;
-    max-width: 960px;
+    width: 100%;
+    max-width: 70%;
     text-align: center;
+    border-collapse: collapse;
+    height: 100%;
+    overflow-scrolling: auto;
 }
 
-.rs {
-    float: right;
-    /*text-align: right;*/
+.mainTr {
+    background: #486ca0;
+    height: 10%;
 }
 
-.rq {
-    text-align: left;
+.bodyTable {
+    border-collapse: collapse;
+    width: 90%;
+    height: 90%;
+}
+
+textarea:hover {
+    box-shadow: 0 0 5px 2px #486ca0;
+}
+
+textarea.code {
+    resize: none;
+    height: 300px;
+    width: 100%;
+    alignment: center;
+}
+
+textarea.response {
+    resize: none;
+    height: 100px;
+    width: 100%;
+    alignment: left;
+}
+
+textarea.vars {
+    resize: none;
+    height: 100px;
+    width: 100%;
+    alignment: right;
+}
+
+.footer {
+    font-style: oblique;
+    font-size: 14px;
+}
+
+.header {
+    font-family: menlo, sans-serif;
+    font-size: 20px;
+}
+
+body {
+    margin: 0px;
+}
+
+.button {
+    border-radius: 10px;
+    width: 10%;
+    height: 75%;
+}
+
+.button:hover {
+    width: 10.5%;
+    height: 85%;
+    box-shadow: 0 0 5px 2px #486ca0;
+}
+
+.mainHeader {
+    border-radius: 0px 0px 50px 50px;
+    box-shadow: 0 0 5px;
+}
+
+.mainFooter {
+    border-radius: 50px 50px 0px 0px;
+    box-shadow: 0 0 5px;
 }
