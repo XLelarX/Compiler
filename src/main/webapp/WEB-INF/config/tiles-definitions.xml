@@ -4,10 +4,7 @@
         "http://jakarta.apache.org/struts/dtds/tiles-config_1_1.dtd">
 
 <tiles-definitions>
-    <definition name="main" path="/WEB-INF/jsp/main.jsp">
-        <put type="string" name="title" value="Compiler"/>
-        <put type="page" name="header" value="/WEB-INF/jsp/header.jsp"/>
-        <put type="page" name="body" value="/WEB-INF/jsp/body.jsp"/>
-        <put type="page" name="footer" value="/WEB-INF/jsp/footer.jsp"/>
+    <definition name="button" path="/WEB-INF/jsp/button.jsp">
+
     </definition>
 </tiles-definitions>

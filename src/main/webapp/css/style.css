@@ -1,81 +1,114 @@
-.page {
-    margin: auto;
-    width: 100%;
-    max-width: 70%;
-    text-align: center;
-    border-collapse: collapse;
-    height: 100%;
-    overflow-scrolling: auto;
-}
-
-.mainTr {
-    background: #486ca0;
-    height: 10%;
-}
-
-.bodyTable {
-    border-collapse: collapse;
-    width: 90%;
-    height: 90%;
-}
-
-textarea:hover {
-    box-shadow: 0 0 5px 2px #486ca0;
-}
-
-textarea.code {
-    resize: none;
-    height: 300px;
-    width: 100%;
-    alignment: center;
-}
-
-textarea.response {
-    resize: none;
-    height: 100px;
-    width: 100%;
-    alignment: left;
-}
-
-textarea.vars {
-    resize: none;
-    height: 100px;
-    width: 100%;
-    alignment: right;
-}
-
-.footer {
-    font-style: oblique;
-    font-size: 14px;
-}
-
-.header {
-    font-family: menlo, sans-serif;
-    font-size: 20px;
-}
-
 body {
     margin: 0px;
+    overflow: hidden;
+    /*background-color: grey;*/
+}
+
+#container {
+    width: 70%;
+    height: 100vh;
+    margin: auto;
+}
+
+#menu {
+    background: #93a091;
+    width: 20%;
+    height: 100%;
+    float: left;
+}
+
+.code {
+    border-left: 1px solid grey;
+    border-right: 1px solid grey;
+    height: 80%;
+    width: calc(80% - 2px);
+    background: aqua;
+    float: right;
+}
+
+#bottom {
+    float: right;
+    width: 80%;
+    height: 20%;
+}
+
+#vars {
+    height: 100%;
+    width: 20%;
+    float: left;
+    background: antiquewhite;
+}
+
+#out {
+    float: right;
+    width: 80%;
+    height: 100%;
+    background: #486ca0;
+}
+
+#cr {
+    position: absolute;
+    bottom: 0;
+    padding-top: 5px;
+    font-family: 'Staatliches', cursive;
+    /*font-family: cursive;*/
+    border-top: 2px solid;
+    border-color: #ffc27f;
+    width: calc((100% * 0.7 * 0.2) - (100% * 0.7 * 0.2 * 0.2));
+    text-align: center;
+    margin: 5px calc(100% * 0.7 * 0.2 * 0.1);
+}
+
+textarea {
+    outline: none;
+    font-size: 16px;
+    resize: none;
+    height: 100%;
+    width: 100%;
+    border-color: grey;
+    font-family: 'Ubuntu Mono', monospace;
 }
 
 .button {
-    border-radius: 10px;
-    width: 10%;
-    height: 75%;
+    height: 0px;
+    border: 0px;
+    border-radius: 5px;
+    width: 50%;
+    /*min-width: 100px;*/
+    padding-bottom: 15%;
+    background-image: url("/img/run.jpg");
+    background-size: 100% 100%;
+    margin: auto;
+    display: block;
 }
 
-.button:hover {
-    width: 10.5%;
-    height: 85%;
-    box-shadow: 0 0 5px 2px #486ca0;
+#logo {
+    font-family: 'Staatliches', cursive;
+    font-size: 25px;
+    bottom: 0;
+    padding-bottom: 5px;
+    border-bottom: 2px solid;
+    border-color: #ffc27f;
+    text-align: center;
+    margin: 10px 10%;
 }
 
-.mainHeader {
-    border-radius: 0px 0px 50px 50px;
-    box-shadow: 0 0 5px;
+.center {
+    height: 83%;
+    padding-bottom: 5%;
+    padding-top: 5%;
 }
 
-.mainFooter {
-    border-radius: 50px 50px 0px 0px;
-    box-shadow: 0 0 5px;
+#resize {
+    float: right;
+    margin-right: 0;
+    width: 5px;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.1);
+    z-index: 1;
+    cursor: e-resize;
+}
+
+#varsInner {
+    /*width: calc(100% - 5px);*/
 }

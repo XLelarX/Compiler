@@ -7,24 +7,8 @@
     <head>
     </head>
     <body>
-    <table class="bodyTable">
-        <tr>
-            <td colspan="2" align="center">
-                <html:textarea styleClass="code" property="request"/>
-            </td>
-        <tr height="7%">
-            <td colspan="2" align="center">
-                <html:submit styleClass="button">SEND</html:submit>
-            </td>
-        </tr>
-        <tr>
-            <td align="right" width="25%">
-                <html:textarea styleClass="vars" property="vars"/>
-            </td>
-            <td align="left" width="75%">
-                <html:textarea styleClass="response" disabled="true" property="response"/>
-            </td>
-        </tr>
-    </table>
+    <html:textarea styleClass="code" property="request"/>
+    <html:textarea styleClass="vars" property="vars"/>
+    <html:textarea styleClass="response" disabled="true" property="response"/>
     </body>
 </html:html>

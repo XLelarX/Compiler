@@ -1,6 +1,5 @@
 package compiler.lelar.compiler;
 
-import org.apache.struts.action.Action;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -15,11 +14,17 @@ public class CompilerAction extends DispatchAction {
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
         CompilerForm compilerForm = (CompilerForm) form;
+
         StringBuilder requestCode = new StringBuilder(compilerForm.getRequest());
         String vars = compilerForm.getVars();
 
-        CompilerEntity compilerEntity = new Runner().run(requestCode.toString(), vars);
-
+        CompilerEntity compilerEntity = new CompilerEntity();
+        try {
+            compilerEntity = new Runner().start(requestCode.toString(), vars);
+        } catch (Exception e) {
+            compilerForm.setResponse(e.getMessage());
+            return mapping.findForward(START_FORWARD);
+        }
         StringBuilder responseCode = new StringBuilder();
 
         if (compilerEntity.getOut() != null)
@@ -30,9 +35,7 @@ public class CompilerAction extends DispatchAction {
             responseCode.append(err).append("\r\n");
 
         compilerForm.setResponse(responseCode.toString());
-
-//        return super.execute(mapping, form, request, response);
-        return mapping.findForward(START_FORWARD);/*super.execute(mapping form, request, response);*/
+        return mapping.findForward(START_FORWARD);
     }
 
 }

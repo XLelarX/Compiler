@@ -3,11 +3,15 @@ package compiler.lelar.compiler;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.*;
 
 class Runner {
-    private final static String PATH = "C:/Programs/JavaProjects/compiler/Compiler/";
+    private final static String PATH = "/Users/Lelar/Desktop/JavaProjects/compiler/";
+    private final static String EXECUTION_ERRORS = "Execution errors: ";
+    private final static String COMPILE_ERRORS = "Compile errors: ";
 
-    CompilerEntity run(String code, String vars) throws InterruptedException, IOException {
+
+    private CompilerEntity run(String code, String vars) throws InterruptedException, IOException {
 
         String className = getClassName(code);
         File newFile = new File(PATH + className + ".java");
@@ -36,7 +40,7 @@ class Runner {
 
             List<String> errList = reader(stderr);
             if (!errList.isEmpty())
-                errList.add(0, "Execution errors:");
+                errList.add(0, EXECUTION_ERRORS);
 
             CompilerEntity outEntity = new CompilerEntity(reader(stdout), errList);
 
@@ -46,7 +50,7 @@ class Runner {
             return outEntity;
         } else {
             List<String> errList = reader(stderr);
-            errList.add(0, "Compile errors:");
+            errList.add(0, COMPILE_ERRORS);
 
             CompilerEntity outEntity = new CompilerEntity(null, errList);
 
@@ -87,6 +91,30 @@ class Runner {
 
         reader.close();
         return out;
+    }
+
+    CompilerEntity start(String code, String vars) throws Exception {
+        ExecutorService service = Executors.newSingleThreadExecutor();
+
+        final CompilerEntity[] compilerEntity = {new CompilerEntity()};
+        try {
+            Runnable r = () -> {
+                try {
+                    compilerEntity[0] = Runner.this.run(code, vars);
+                } catch (InterruptedException | IOException e) {
+                    e.printStackTrace();
+                }
+            };
+
+            Future<?> f = service.submit(r);
+
+            f.get(25, TimeUnit.SECONDS);     // attempt the task for two minutes
+        } catch (final InterruptedException | TimeoutException | ExecutionException e) {
+            throw new Exception(EXECUTION_ERRORS+ '\n' + e);
+        } finally {
+            service.shutdown();
+        }
+        return compilerEntity[0];
     }
 }
 
