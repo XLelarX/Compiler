@@ -20,7 +20,7 @@ body {
 .code {
     border-left: 1px solid grey;
     border-right: 1px solid grey;
-    height: 80%;
+    height: 50%;
     width: calc(80% - 2px);
     background: aqua;
     float: right;
@@ -29,19 +29,19 @@ body {
 #bottom {
     float: right;
     width: 80%;
-    height: 20%;
+    height: calc(50% - 5px);
 }
 
 #vars {
     height: 100%;
-    width: 20%;
+    width: 50%;
     float: left;
     background: antiquewhite;
 }
 
 #out {
     float: right;
-    width: 80%;
+    width: 50%;
     height: 100%;
     background: #486ca0;
 }
@@ -76,7 +76,7 @@ textarea {
     width: 50%;
     /*min-width: 100px;*/
     padding-bottom: 15%;
-    background-image: url("/img/run.jpg");
+    /*background-image: url("/img/run.jpg");*/
     background-size: 100% 100%;
     margin: auto;
     display: block;
@@ -104,11 +104,22 @@ textarea {
     margin-right: 0;
     width: 5px;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.1);
+    background-color: #b5b5b5;
     z-index: 1;
-    cursor: e-resize;
+    cursor: col-resize;
 }
 
 #varsInner {
-    /*width: calc(100% - 5px);*/
+    width: calc(100% - 5px);
+    border-right: none;
+    border-top: none;
+}
+
+#horizontalResize {
+    height: 5px;
+    width: 100%;
+    background-color: #b5b5b5;
+    z-index: 1;
+    margin-bottom: 0;
+    cursor: row-resize;
 }

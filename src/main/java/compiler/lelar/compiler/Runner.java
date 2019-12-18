@@ -6,14 +6,16 @@ import java.util.List;
 import java.util.concurrent.*;
 
 class Runner {
+//    private final static String PATH = "/classes/";//TODO реализовать создание папки с последующим ее удалдением
     private final static String PATH = "/Users/Lelar/Desktop/JavaProjects/compiler/";
     private final static String EXECUTION_ERRORS = "Execution errors: ";
     private final static String COMPILE_ERRORS = "Compile errors: ";
+    private final static String CREATE_ERRORS = "Create errors: ";
 
 
-    private CompilerEntity run(String code, String vars) throws InterruptedException, IOException {
+    private CompilerEntity run(String className, String code, String vars) throws InterruptedException, IOException {
 
-        String className = getClassName(code);
+//        String className = getClassName(code);
         File newFile = new File(PATH + className + ".java");
 
         if (!newFile.exists()) {//TODO Допилить проверку при существовании файла
@@ -24,13 +26,14 @@ class Runner {
         fileOutputStream.write(code.getBytes());
         fileOutputStream.close();
 
-
+//        Process process = new ProcessBuilder("javac", PATH + className + ".java").start();
         Process process = new ProcessBuilder("javac", className + ".java").start();
         Thread.sleep(1000);
 
         InputStream stderr = process.getErrorStream();
         if (stderr.available() == 0) {
 
+//            process = new ProcessBuilder("java", "-cp", PATH, className).start();
             process = new ProcessBuilder("java", className).start();
             OutputStream stdin = process.getOutputStream();
             InputStream stdout = process.getInputStream();
@@ -59,9 +62,12 @@ class Runner {
         }
     }
 
-    private String getClassName(String code) {
+    String getClassName(String code) throws IOException {
         StringBuilder className = new StringBuilder();
         int indexOfStartClassName = code.indexOf("class ") + 5;//TODO если текст пустой
+
+        if (indexOfStartClassName == 4)
+            throw new IOException(CREATE_ERRORS + "\n   Code textarea is empty");
 
         while (code.charAt(indexOfStartClassName) == ' ')
             indexOfStartClassName++;
@@ -93,14 +99,14 @@ class Runner {
         return out;
     }
 
-    CompilerEntity start(String code, String vars) throws Exception {
+    CompilerEntity start(String className, String code, String vars) throws Exception {
         ExecutorService service = Executors.newSingleThreadExecutor();
 
         final CompilerEntity[] compilerEntity = {new CompilerEntity()};
         try {
             Runnable r = () -> {
                 try {
-                    compilerEntity[0] = Runner.this.run(code, vars);
+                    compilerEntity[0] = Runner.this.run(className,code, vars);
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                 }
@@ -110,7 +116,7 @@ class Runner {
 
             f.get(25, TimeUnit.SECONDS);     // attempt the task for two minutes
         } catch (final InterruptedException | TimeoutException | ExecutionException e) {
-            throw new Exception(EXECUTION_ERRORS+ '\n' + e);
+            throw new Exception(EXECUTION_ERRORS + '\n' + e);
         } finally {
             service.shutdown();
         }

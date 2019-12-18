@@ -13,6 +13,7 @@ public class CompilerAction extends DispatchAction {
 
     @Override
     public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception {
+        request.setCharacterEncoding("UTF-8");
         CompilerForm compilerForm = (CompilerForm) form;
 
         StringBuilder requestCode = new StringBuilder(compilerForm.getRequest());
@@ -20,7 +21,8 @@ public class CompilerAction extends DispatchAction {
 
         CompilerEntity compilerEntity = new CompilerEntity();
         try {
-            compilerEntity = new Runner().start(requestCode.toString(), vars);
+            String className = new Runner().getClassName(requestCode.toString());
+            compilerEntity = new Runner().start(className, requestCode.toString(), vars);
         } catch (Exception e) {
             compilerForm.setResponse(e.getMessage());
             return mapping.findForward(START_FORWARD);
