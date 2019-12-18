@@ -6,17 +6,26 @@ import java.util.List;
 import java.util.concurrent.*;
 
 class Runner {
-//    private final static String PATH = "/classes/";//TODO реализовать создание папки с последующим ее удалдением
-    private final static String PATH = "/Users/Lelar/Desktop/JavaProjects/compiler/";
+        private final static String PATH = "/classes/";
+//    private final static String PATH = "/Users/Lelar/Desktop/JavaProjects/compiler/";
     private final static String EXECUTION_ERRORS = "Execution errors: ";
     private final static String COMPILE_ERRORS = "Compile errors: ";
     private final static String CREATE_ERRORS = "Create errors: ";
 
 
     private CompilerEntity run(String className, String code, String vars) throws InterruptedException, IOException {
+        String folderName;
+        List<String> mkdirErr;
+        Process process;
 
-//        String className = getClassName(code);
-        File newFile = new File(PATH + className + ".java");
+        do {
+            folderName = className + Math.round(Math.random() * 100);
+            process = new ProcessBuilder("mkdir", PATH + folderName).start();
+            mkdirErr = reader(process.getErrorStream());
+        }
+        while (!mkdirErr.isEmpty() && mkdirErr.get(0).equals("mkdir: " + PATH + folderName + ": File exists"));
+
+        File newFile = new File(PATH + folderName + "/" + className + ".java");
 
         if (!newFile.exists()) {//TODO Допилить проверку при существовании файла
             newFile.createNewFile();
@@ -27,14 +36,14 @@ class Runner {
         fileOutputStream.close();
 
 //        Process process = new ProcessBuilder("javac", PATH + className + ".java").start();
-        Process process = new ProcessBuilder("javac", className + ".java").start();
+        process = new ProcessBuilder("javac", PATH + folderName + "/" + className + ".java").start();
         Thread.sleep(1000);
 
         InputStream stderr = process.getErrorStream();
         if (stderr.available() == 0) {
 
 //            process = new ProcessBuilder("java", "-cp", PATH, className).start();
-            process = new ProcessBuilder("java", className).start();
+            process = new ProcessBuilder("java", "-cp", PATH + folderName + "/", className).start();
             OutputStream stdin = process.getOutputStream();
             InputStream stdout = process.getInputStream();
             stderr = process.getErrorStream();
@@ -47,8 +56,10 @@ class Runner {
 
             CompilerEntity outEntity = new CompilerEntity(reader(stdout), errList);
 
-            newFile.delete();
-            new File(PATH + className + ".class").delete();
+//            newFile.delete();
+//            new File(PATH + className + ".class").delete();
+            Thread.sleep(1000);
+            new ProcessBuilder("rm", "-R", PATH + folderName).start();
 
             return outEntity;
         } else {
@@ -57,7 +68,9 @@ class Runner {
 
             CompilerEntity outEntity = new CompilerEntity(null, errList);
 
-            newFile.delete();
+//            newFile.delete();
+            Thread.sleep(1000);
+            new ProcessBuilder("rm", "-R", PATH + folderName).start();
             return outEntity;
         }
     }
@@ -106,7 +119,7 @@ class Runner {
         try {
             Runnable r = () -> {
                 try {
-                    compilerEntity[0] = Runner.this.run(className,code, vars);
+                    compilerEntity[0] = Runner.this.run(className, code, vars);
                 } catch (InterruptedException | IOException e) {
                     e.printStackTrace();
                 }
