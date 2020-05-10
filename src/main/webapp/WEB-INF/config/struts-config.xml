@@ -13,5 +13,10 @@
                 validate="false">
             <forward name="Start" path="/WEB-INF/jsp/compiler.jsp"/>
         </action>
+        <action path="/compileAjax"
+                type="compiler.lelar.compiler.AjaxCompileAction"
+                name="CompilerForm"
+                validate="false">
+        </action>
     </action-mappings>
 </struts-config>

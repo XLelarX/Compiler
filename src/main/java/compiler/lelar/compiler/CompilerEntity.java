@@ -1,34 +1,67 @@
 package compiler.lelar.compiler;
 
+import java.util.Collections;
 import java.util.List;
 
-public class CompilerEntity {
-    private List<String> out;
-    private List<String> err;
+/**
+ * Сущность для взаимодействия {@link CompilerAction} и наследников {@link runner.BaseCodeRunner}
+ */
+public class CompilerEntity
+{
+	/**
+	 * Вывод выполненной программы
+	 */
+	private List<String> out;
 
-    public CompilerEntity(List<String> out, List<String> err) {
-        this.out = out;
-        this.err = err;
-    }
+	/**
+	 * Ошибки при выполнении программы
+	 */
+	private List<String> errors;
 
-    public CompilerEntity() {
+	/**
+	 * Завершилась ли программы
+	 */
+	private boolean completed;
 
-    }
+	public CompilerEntity(List<String> out, List<String> errors)
+	{
+		this.out = out;
+		this.errors = errors;
+	}
 
-    public List<String> getOut() {
-        return out;
-    }
+	public CompilerEntity()
+	{
+		out = Collections.emptyList();
+		errors = Collections.emptyList();
+	}
 
-    public void setOut(List<String> out) {
-        this.out = out;
-    }
+	List<String> getOut()
+	{
+		return out;
+	}
 
-    public List<String> getErr() {
-        return err;
-    }
+	void setOut(List<String> out)
+	{
+		this.out = out;
+	}
 
-    public void setErr(List<String> err) {
-        this.err = err;
-    }
+	List<String> getErrors()
+	{
+		return errors;
+	}
 
+	void setErrors(List<String> errors)
+	{
+		this.errors = errors;
+	}
+
+	public boolean isCompleted()
+	{
+		return completed;
+	}
+
+	public void setCompleted(boolean completed)
+	{
+		this.completed = completed;
+	}
 }

@@ -3,11 +3,12 @@ package compiler.lelar.compiler;
 import org.apache.struts.action.ActionForm;
 
 public class CompilerForm extends ActionForm {
-    private String request="public class Main {\r\n" +
-            "    public static void main(String[] args) {\r\n" +
-            "        System.out.println(\"Hello world\");\r\n" +
-            "    }\r\n" +
-            "}\r\n";
+    private String request;
+//            "public class Main {\r\n" +
+//            "    public static void main(String[] args) {\r\n" +
+//            "        System.out.println(\"Hello world\");\r\n" +
+//            "    }\r\n" +
+//            "}\r\n";
     private String response;
     private String vars;
 

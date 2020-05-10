@@ -22,7 +22,41 @@
         <div id="menu">
             <div id="logo">ONLINE COMPILER</div>
             <div class="center">
-                <html:submit style="background-image: url('${pageContext.request.contextPath}/img/run.jpg')" styleClass="button" value=" "/>
+                <script>
+                    function myFunc() {
+                        var sendingCode = "";
+                        var elementList = document.getElementsByClassName("CodeMirror-line");
+                        for (var i = 0; i < elementList.length; i++) {
+                            sendingCode += elementList[i].innerText.split("+").join("\\plus") + "\n";
+                        }
+                        //alert(sendingCode);
+
+                        $.ajax({
+                            type: 'POST',
+                            url: 'compileAjax.do',
+                            data: "request=" + sendingCode + "&vars="
+                                + document.getElementById("varsInner").value.split("+").join("\\plus"),
+                            dataType: 'json',
+                            success:
+                                function (data) {
+                                    // alert("Data Loaded: " + data.response.replace("\\plus", "+"));
+                                    //document.getElementById("code").value += data.request;
+
+                                    document.getElementById("varsInner").value += data.response.split("\\plus").join("+");//$("#varsInner").append(data.response);
+                                }
+                        });
+                    }
+                </script>
+                <html:button property="e"
+                             style="background-image: url('${pageContext.request.contextPath}/img/run.jpg')"
+                             styleClass="button"
+                             onclick="myFunc();"
+                             value=" "/>
+                    <%--                <html:submit style="background-image: url('${pageContext.request.contextPath}/img/run.jpg')"--%>
+                    <%--                             styleClass="button"--%>
+                    <%--                             onclick="myFunc();"--%>
+                    <%--                             value=" "--%>
+                    <%--                />--%>
             </div>
             <div align="center" id="cr">©2019 Lelar</div>
         </div>
@@ -35,7 +69,8 @@
                 <html:textarea onkeydown="insertTab(this, event);" styleId="varsInner" property="vars"/>
                 <div id="resize"></div>
             </div>
-            <div id="out"><html:textarea style="border-top:none;border-left:none" disabled="true" property="response"/></div>
+            <div id="out"><html:textarea style="border-top:none;border-left:none" disabled="true"
+                                         property="response"/></div>
         </div>
     </div>
 
@@ -51,28 +86,22 @@
         var pos = editor.posFromIndex(3);  //получить координаты 3-ей позиции (строку и символ)
         editor.setCursor(pos.line, pos.ch);
 
-        function insertTab(o, e)
-        {
+        function insertTab(o, e) {
             var kC = e.keyCode ? e.keyCode : e.charCode ? e.charCode : e.which;
-            if (kC == 9 && !e.shiftKey && !e.ctrlKey && !e.altKey)
-            {
+            if (kC == 9 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
                 var oS = o.scrollTop;
-                if (o.setSelectionRange)
-                {
+                if (o.setSelectionRange) {
                     var sS = o.selectionStart;
                     var sE = o.selectionEnd;
                     o.value = o.value.substring(0, sS) + "  " + o.value.substr(sE);
                     o.setSelectionRange(sS + 2, sS + 2);
                     o.focus();
-                }
-                else if (o.createTextRange)
-                {
+                } else if (o.createTextRange) {
                     document.selection.createRange().text = "  ";
                     e.returnValue = false;
                 }
                 o.scrollTop = oS;
-                if (e.preventDefault)
-                {
+                if (e.preventDefault) {
                     e.preventDefault();
                 }
                 return false;
