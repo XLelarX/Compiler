@@ -14,7 +14,17 @@
             <forward name="Start" path="/WEB-INF/jsp/compiler.jsp"/>
         </action>
         <action path="/compileAjax"
-                type="compiler.lelar.compiler.AjaxCompileAction"
+                type="controller.CompileRestService"
+                name="CompilerForm"
+                validate="false">
+        </action>
+        <action path="/sendVars"
+                type="controller.SendVarsRestService"
+                name="CompilerForm"
+                validate="false">
+        </action>
+        <action path="/getResult"
+                type="controller.GetResultRestService"
                 name="CompilerForm"
                 validate="false">
         </action>

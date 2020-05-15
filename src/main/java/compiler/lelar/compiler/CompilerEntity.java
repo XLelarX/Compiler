@@ -33,9 +33,17 @@ public class CompilerEntity
 	{
 		out = Collections.emptyList();
 		errors = Collections.emptyList();
+		completed = false;
 	}
 
-	List<String> getOut()
+	public CompilerEntity(List<String> out, List<String> errors, boolean completed)
+	{
+		this.out = out;
+		this.errors = errors;
+		this.completed = completed;
+	}
+
+	public List<String> getOut()
 	{
 		return out;
 	}

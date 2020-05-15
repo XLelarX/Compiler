@@ -23,7 +23,7 @@
             <div id="logo">ONLINE COMPILER</div>
             <div class="center">
                 <script>
-                    function myFunc() {
+                    function sendData() {
                         var sendingCode = "";
                         var elementList = document.getElementsByClassName("CodeMirror-line");
                         for (var i = 0; i < elementList.length; i++) {
@@ -32,25 +32,62 @@
                         //alert(sendingCode);
 
                         $.ajax({
-                            type: 'POST',
+                            type: 'GET',
                             url: 'compileAjax.do',
-                            data: "request=" + sendingCode + "&vars="
-                                + document.getElementById("varsInner").value.split("+").join("\\plus"),
+                            data: "request=" + sendingCode + "&vars=" + document.getElementById("varsInner").value.split("+").join("\\plus"),
                             dataType: 'json',
                             success:
                                 function (data) {
-                                    // alert("Data Loaded: " + data.response.replace("\\plus", "+"));
-                                    //document.getElementById("code").value += data.request;
-
-                                    document.getElementById("varsInner").value += data.response.split("\\plus").join("+");//$("#varsInner").append(data.response);
+                                    //alert(data.response + "    " + data.complete);
+                                    document.getElementById("innerResponse").value
+                                        += data.response.split("\\plus").join("+");//$("#varsInner").append(data.response);
                                 }
                         });
                     }
+
+                    function sendVars() {
+                        $.ajax({
+                            type: 'GET',
+                            url: 'sendVars.do',
+                            data: "vars=" + document.getElementById("varsInner").value.split("+").join("\\plus"),
+                            dataType: 'json',
+                            success:
+                                function (data) {
+                                    document.getElementById("innerResponse").value
+                                        += data.response.split("\\plus").join("+");//$("#varsInner").append(data.response);
+                                }
+                        });
+                    }
+
+                    function getResult() {
+                        $.ajax({
+                            type: 'GET',
+                            url: 'getResult.do',
+                            dataType: 'json',
+                            success:
+                                function (data) {
+                                    document.getElementById("innerResponse").value
+                                        += data.response.split("\\plus").join("+");//$("#varsInner").append(data.response);
+                                }
+                        });
+                    }
+
                 </script>
-                <html:button property="e"
+                <html:button property="sender1"
                              style="background-image: url('${pageContext.request.contextPath}/img/run.jpg')"
                              styleClass="button"
-                             onclick="myFunc();"
+                             onclick="sendData();"
+                             value=" "/>
+
+                <html:button property="sender2"
+                             style="background-image: url('${pageContext.request.contextPath}/img/run.jpg')"
+                             styleClass="button"
+                             onclick="sendVars();"
+                             value=" "/>
+                <html:button property="sender3"
+                             style="background-image: url('${pageContext.request.contextPath}/img/run.jpg')"
+                             styleClass="button"
+                             onclick="getResult();"
                              value=" "/>
                     <%--                <html:submit style="background-image: url('${pageContext.request.contextPath}/img/run.jpg')"--%>
                     <%--                             styleClass="button"--%>
@@ -69,8 +106,13 @@
                 <html:textarea onkeydown="insertTab(this, event);" styleId="varsInner" property="vars"/>
                 <div id="resize"></div>
             </div>
-            <div id="out"><html:textarea style="border-top:none;border-left:none" disabled="true"
-                                         property="response"/></div>
+            <div id="out">
+                <html:textarea style="border-top:none;border-left:none"
+                               disabled="true"
+                               property="response"
+                               styleId="innerResponse"
+                />
+            </div>
         </div>
     </div>
 

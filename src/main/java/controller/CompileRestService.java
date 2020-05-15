@@ -1,7 +1,9 @@
-package compiler.lelar.compiler;
+package controller;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import compiler.lelar.compiler.CompilerEntity;
+import compiler.lelar.compiler.CompilerForm;
 import exception.CompilerException;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
@@ -16,7 +18,7 @@ import java.io.PrintWriter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class AjaxCompileAction extends DispatchAction
+public class CompileRestService extends DispatchAction
 {
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception

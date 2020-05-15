@@ -6,9 +6,7 @@ import logger.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -21,17 +19,23 @@ public abstract class BaseCodeRunner
 	final static String EXECUTION_ERRORS = "Execution errors: ";
 	final static String COMPILE_ERRORS = "Compile errors: ";
 	final static String CREATE_ERRORS = "Create errors: ";
-	final static long COMPILE_TIME = 2500;
+	final static long EXECUTION_TIME = 2000;
+
+	//public static Map<String, AtomicReference<Process>> processes = new HashMap<>();
+	public static Map<String, Process> processes = new HashMap<>();
+	public static Map<String, Thread> threads = new HashMap<>();
+	public volatile static Map<String, List<String>> out = new HashMap<>();
+	public volatile static Map<String, List<String>> in = new HashMap<>();
 
 	/**
 	 * Компиляция и выполнение программы
 	 *
-	 * @param code    - Код программы
-	 * @param vars    - Переменные, передаваемые в программу, во время ее выполнения
-	 * @param request - Входящий запрос
+	 * @param code      - Код программы
+	 * @param vars      - Переменные, передаваемые в программу, во время ее выполнения
+	 * @param sessionId - id пользователя
 	 * @return - Результат запуска программы
 	 */
-	abstract CompilerEntity run(String code, String vars, HttpServletRequest request)
+	abstract CompilerEntity run(String code, String vars, String sessionId)
 			throws InterruptedException, IOException, CompilerException;
 
 	/**
@@ -54,7 +58,7 @@ public abstract class BaseCodeRunner
 			service.submit(() -> {
 				try
 				{
-					atomicCompilerEntity.set(run(code, vars == null ? "" : vars, request));
+					atomicCompilerEntity.set(run(code, vars == null ? "" : vars, request.getSession().getId()));
 				} catch (InterruptedException | IOException | CompilerException e)
 				{
 					Logger.fillLog(e);
@@ -77,26 +81,160 @@ public abstract class BaseCodeRunner
 	/**
 	 * Чтение данных из входного стрима
 	 *
-	 * @param inputStream - Входной стрим
-	 * @return - Обрабатываемый в будущем код
+	 * @return - Выходные данные из потока
 	 */
-	List<String> readFrom(InputStream inputStream)
+	public static List<String> readFrom(String sessionId)
 	{
-		String line;
-		List<String> out = new ArrayList<>();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+		Process atomicProcess = processes.get(sessionId);
+//		AtomicReference<Process> atomicProcess = processes.get(sessionId);
 
-		try
+		if (atomicProcess != null)
 		{
-			while ((line = reader.readLine()) != null)
-				out.add(line);
-			reader.close();
-		} catch (IOException e)
-		{
-			Logger.fillLog(e);
+			//Process process = atomicProcess;
+
+			List<String> output = new ArrayList<>();
+			out.put(sessionId, output);
+			BufferedReader reader = new BufferedReader(new InputStreamReader(atomicProcess.getInputStream()));//process.getInputStream()));
+			Thread thread1 =
+					new Thread(() -> {
+						try
+						{
+							String line;
+							while ((line = reader.readLine()) != null)
+								output.add(line);
+							reader.close();
+						} catch (IOException e)
+						{
+							Logger.fillLog(e);
+						}
+					});
+			thread1.setPriority(6);
+			thread1.start();
+			threads.put(sessionId, thread1);
+
+			long time = System.currentTimeMillis();
+			while (thread1.isAlive() && System.currentTimeMillis() - time < EXECUTION_TIME)
+			{
+			}
+			//thread.interrupt();
+
+
+//		try
+//		{
+//			ExecutorService executorService = Executors.newSingleThreadExecutor();
+//			//AtomicReference<CompilerEntity> atomicCompilerEntity = new AtomicReference<>();
+//
+//
+//
+//			try
+//			{
+//				executorService.submit(() -> {
+//					try
+//					{
+//						String line;
+//						while ((line = reader.readLine()) != null)
+//							out.add(line);
+//					} catch (IOException e)
+//					{
+//						Logger.fillLog(e);
+//					}
+//				}).get(2000, TimeUnit.SECONDS);// attempt the task for two minutes
+//			} catch (InterruptedException | TimeoutException | ExecutionException e)
+//			{
+//				throw new CompilerException(EXECUTION_ERRORS + '\n' + e);
+//			} finally
+//			{
+//				executorService.shutdown();
+//			}
+//
+//
+//			//reader.close();
+//		} catch (Exception e)
+//		{
+//			Logger.fillLog(e);
+//		}
+
+			//thread.interrupt();
+			return output;
 		}
 
-		return out;
+		return null;
+	}
+
+	public static List<String> readFrom(Process process) throws IOException
+	{
+		List<String> output = new ArrayList<>();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+		String line;
+
+		while ((line = reader.readLine()) != null)
+			output.add(line);
+		reader.close();
+
+		return output;
+	}
+
+	public static void writeInProcess(String sessionId, List<String> input)
+			throws IOException
+	{
+		Process atomicProcess = processes.get(sessionId);
+//		AtomicReference<Process> atomicProcess = processes.get(sessionId);
+
+		if (atomicProcess != null)
+		{
+			//in.put(sessionId, input);
+
+			BufferedWriter writer =
+					new BufferedWriter(new OutputStreamWriter(atomicProcess.getOutputStream()));
+
+//			Thread thread = new Thread(() -> {
+//				Process process = processes.get(sessionId).get();
+//				while (process.isAlive())
+//				{
+//					List<String> line = in.get(sessionId);
+//
+//					try
+//					{
+			for (String s : input)
+			{
+				writer.write(s);
+				writer.newLine();
+				writer.flush();
+				//line.remove(s);
+			}
+//					} catch (IOException e)
+//					{
+//						e.printStackTrace();
+//					}
+//				}
+//			});
+//			thread.setPriority(7);
+//			thread.start();
+//			input.forEach(inputString -> {
+//				try
+//				{
+//					bufferedWriterHashMap.get(sessionId).write(inputString);
+//					bufferedWriterHashMap.get(sessionId).newLine();
+//					bufferedWriterHashMap.get(sessionId).flush();
+//				} catch (IOException e)
+//				{
+//					e.printStackTrace();
+//				}
+//			});
+		}
+	}
+
+	public static void writeInProcess(Process process, List<String> input)
+			throws IOException
+	{
+		BufferedWriter writer =
+				new BufferedWriter(new OutputStreamWriter(process.getOutputStream()));
+		for (String s : input)
+		{
+			writer.write(s);
+			writer.newLine();
+			writer.flush();
+		}
 	}
 
 	/**
@@ -106,7 +244,7 @@ public abstract class BaseCodeRunner
 	 * @return - Имя папки с исполняемыми файлами
 	 * @throws IOException - Ошибка при чтении из стрима
 	 */
-	String createFolder(String executionFileName) throws IOException
+	String createFolder(String executionFileName, String sessionId) throws IOException
 	{
 		Process process;
 		List<String> mkdirErr;
@@ -116,10 +254,21 @@ public abstract class BaseCodeRunner
 		{
 			folderName = executionFileName + Math.round(Math.random() * 100);
 			process = new ProcessBuilder("mkdir", PATH + folderName).start();
-			mkdirErr = readFrom(process.getErrorStream());
+			mkdirErr = readFrom(process);//TODO Поменять
 		}
 		while (!mkdirErr.isEmpty() && mkdirErr.get(0).equals("mkdir: " + PATH + folderName + ": File exists"));
 
 		return folderName;
+	}
+
+	public static List<String> getResultFor(String sessionId)
+	{
+		return out.get(sessionId);
+	}
+
+
+	public static void removeTemporaryData(String folderName) throws IOException
+	{
+		new ProcessBuilder("rm", "-R", PATH + folderName).start();
 	}
 }

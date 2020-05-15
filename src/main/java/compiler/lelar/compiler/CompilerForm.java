@@ -11,6 +11,7 @@ public class CompilerForm extends ActionForm {
 //            "}\r\n";
     private String response;
     private String vars;
+    private boolean complete;
 
     public String getRequest() {
         return request;
@@ -34,5 +35,15 @@ public class CompilerForm extends ActionForm {
 
     public void setVars(String vars) {
         this.vars = vars;
+    }
+
+    public boolean isComplete()
+    {
+        return complete;
+    }
+
+    public void setComplete(boolean complete)
+    {
+        this.complete = complete;
     }
 }

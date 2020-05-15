@@ -8,7 +8,7 @@ import java.util.Objects;
  */
 public class Logger
 {
-	private final static String LOG_FILE_PATH = "/Users/Lelar/Desktop/JavaProjects/execution/log";
+	private final static String LOG_FILE_PATH = "/Users/Lelar/Desktop/JavaProjects/log";
 	private static PrintStream log;
 	private static boolean logFileExists = true;
 
