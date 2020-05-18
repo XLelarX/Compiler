@@ -14,7 +14,7 @@
             <forward name="Start" path="/WEB-INF/jsp/compiler.jsp"/>
         </action>
         <action path="/compileAjax"
-                type="controller.CompileRestService"
+                type="controller.FirstRequestRestService"
                 name="CompilerForm"
                 validate="false">
         </action>

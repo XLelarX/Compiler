@@ -69,6 +69,6 @@ $(document).ready(function () {
             left: box.left + pageXOffset
         };
     }
-    localStorage.setItem()
 
+    localStorage.setItem();
 });

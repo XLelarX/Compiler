@@ -4,16 +4,18 @@ import compiler.lelar.compiler.CompilerEntity;
 import exception.CompilerException;
 import utils.ConsoleHelper;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * Runner java-кода
- */
-public class JavaCodeRunner extends BaseCodeRunner
+public class CCodeRunner extends BaseCodeRunner
 {
 	@Override
 	CompilerEntity run(String code, String vars, String sessionId)
@@ -56,10 +58,10 @@ public class JavaCodeRunner extends BaseCodeRunner
 	 */
 	private void prepareExecutionFile(String code) throws IOException, CompilerException
 	{
-		executionFileName = extractExecutionFileName(code);
+		executionFileName = "ExecutionFile";//extractExecutionFileName(code);
 		folderName = createFolder(executionFileName);
 
-		File newFile = ConsoleHelper.createJavaFile(folderName, executionFileName);
+		File newFile = ConsoleHelper.createCFile(folderName, executionFileName);
 
 		if (!newFile.createNewFile())
 		{
@@ -82,7 +84,7 @@ public class JavaCodeRunner extends BaseCodeRunner
 	{
 		AtomicReference<Process> process = new AtomicReference<>();
 		ProcessBuilder processBuilder =
-				ConsoleHelper.executeJava(folderName, executionFileName);
+				ConsoleHelper.executeC(folderName, executionFileName);
 		processBuilder.redirectErrorStream(true);
 
 		ExecutorService executor = Executors.newCachedThreadPool();
@@ -137,7 +139,7 @@ public class JavaCodeRunner extends BaseCodeRunner
 	private List<String> compileCode() throws IOException
 	{
 		AtomicReference<Process> process = new AtomicReference<>();
-		ProcessBuilder processBuilder = ConsoleHelper.compileJava(folderName, executionFileName);
+		ProcessBuilder processBuilder = ConsoleHelper.compileC(folderName, executionFileName);
 		ExecutorService executor = Executors.newCachedThreadPool();
 
 		executor.submit(

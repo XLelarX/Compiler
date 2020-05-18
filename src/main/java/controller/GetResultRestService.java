@@ -2,21 +2,18 @@ package controller;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import compiler.lelar.compiler.CompilerEntity;
 import compiler.lelar.compiler.CompilerForm;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
 import runner.BaseCodeRunner;
+import utils.ConsoleHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class GetResultRestService extends DispatchAction
+public class GetResultRestService extends BaseRestService
 {
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
@@ -26,15 +23,15 @@ public class GetResultRestService extends DispatchAction
 		fixRequestedData(compilerForm);
 
 		String sessionId = request.getSession().getId();
-		Process sessionProcess = BaseCodeRunner.processes.get(sessionId);
+		Process sessionProcess = BaseCodeRunner.getProcesses().get(sessionId);
 
 		if (sessionProcess != null)
 		{
 			StringBuilder result = new StringBuilder();
-			BaseCodeRunner.getResultFor(sessionId)
+			BaseCodeRunner.getOut().get(sessionId)
 					.forEach(line -> result.append(line.replace("+", "\\plus")).append("\r\n"));
 
-			if (sessionProcess.isAlive())
+			if (!sessionProcess.isAlive())
 			{
 				compilerForm.setComplete(true);
 			}
@@ -53,22 +50,19 @@ public class GetResultRestService extends DispatchAction
 			{
 				sessionProcess.getInputStream().close();
 				sessionProcess.getErrorStream().close();
-				BaseCodeRunner.processes.remove(sessionId);
+				BaseCodeRunner.getProcesses().remove(sessionId);
+				BaseCodeRunner.getOut().remove(sessionId);
+
+				String folderName = BaseCodeRunner.getFolderNames().remove(sessionId);
+				if (folderName != null)
+				{
+					ConsoleHelper.deleteTemporaryData(folderName);
+				}
 			}
 
 		}
 
 		response.setContentType("application/json");
 		return null;
-	}
-
-	private void fixRequestedData(CompilerForm compilerForm)
-	{
-		Pattern p = Pattern.compile("\u200b|\n$");
-		Matcher m = p.matcher(
-				compilerForm.getRequest()
-						.replace("\u00a0", " ")
-						.replace("\\plus", "+"));
-		compilerForm.setRequest(m.replaceAll(""));
 	}
 }

@@ -27,49 +27,64 @@
                         var sendingCode = "";
                         var elementList = document.getElementsByClassName("CodeMirror-line");
                         for (var i = 0; i < elementList.length; i++) {
-                            sendingCode += elementList[i].innerText.split("+").join("\\plus") + "\n";
+                            sendingCode += elementList[i].innerText.split("+").join("\\plus").split("\t").join("\\tab") + "\\enter";
                         }
-                        //alert(sendingCode);
-
+                        alert(sendingCode);
                         $.ajax({
                             type: 'GET',
                             url: 'compileAjax.do',
-                            data: "request=" + sendingCode + "&vars=" + document.getElementById("varsInner").value.split("+").join("\\plus"),
+                            data: "request=" + sendingCode
+                                + "&language=" + document.getElementById("language").value
+                                + "&vars=" + document.getElementById("varsInner").value.split("+").join("\\plus"),
                             dataType: 'json',
                             success:
                                 function (data) {
-                                    //alert(data.response + "    " + data.complete);
                                     document.getElementById("innerResponse").value
-                                        += data.response.split("\\plus").join("+");//$("#varsInner").append(data.response);
+                                        = data.response.split("\\plus").join("+");
+                                    var isCompleted = data.complete;
+                                    if (!isCompleted) {
+                                        document.getElementById("complete").value = isCompleted;
+                                        setTimeout(getResult(), 2000);
+                                    }
                                 }
                         });
                     }
 
                     function sendVars() {
-                        $.ajax({
-                            type: 'GET',
-                            url: 'sendVars.do',
-                            data: "vars=" + document.getElementById("varsInner").value.split("+").join("\\plus"),
-                            dataType: 'json',
-                            success:
-                                function (data) {
-                                    document.getElementById("innerResponse").value
-                                        += data.response.split("\\plus").join("+");//$("#varsInner").append(data.response);
-                                }
-                        });
+                        if (document.getElementById("complete").value === "false") {
+                            $.ajax({
+                                type: 'GET',
+                                url: 'sendVars.do',
+                                data: "vars=" + document.getElementById("varsInner").value.split("+").join("\\plus"),
+                                dataType: 'json',
+                                success:
+                                    function (data) {
+                                        document.getElementById("innerResponse").value
+                                            += data.response.split("\\plus").join("+");
+                                    }
+                            });
+                        }
                     }
 
                     function getResult() {
-                        $.ajax({
-                            type: 'GET',
-                            url: 'getResult.do',
-                            dataType: 'json',
-                            success:
-                                function (data) {
-                                    document.getElementById("innerResponse").value
-                                        += data.response.split("\\plus").join("+");//$("#varsInner").append(data.response);
-                                }
-                        });
+                        if (document.getElementById("complete").value === "false") {
+                            $.ajax({
+                                type: 'GET',
+                                url: 'getResult.do',
+                                dataType: 'json',
+                                success:
+                                    function (data) {
+                                        document.getElementById("innerResponse").value
+                                            = data.response.split("\\plus").join("+");
+
+                                        var isCompleted = data.complete;
+                                        if (!isCompleted)
+                                            setTimeout(getResult(), 2000);
+                                        else
+                                            document.getElementById("complete").value = isCompleted;
+                                    }
+                            });
+                        }
                     }
 
                 </script>
@@ -78,22 +93,11 @@
                              styleClass="button"
                              onclick="sendData();"
                              value=" "/>
-
-                <html:button property="sender2"
-                             style="background-image: url('${pageContext.request.contextPath}/img/run.jpg')"
-                             styleClass="button"
-                             onclick="sendVars();"
-                             value=" "/>
-                <html:button property="sender3"
-                             style="background-image: url('${pageContext.request.contextPath}/img/run.jpg')"
-                             styleClass="button"
-                             onclick="getResult();"
-                             value=" "/>
-                    <%--                <html:submit style="background-image: url('${pageContext.request.contextPath}/img/run.jpg')"--%>
-                    <%--                             styleClass="button"--%>
-                    <%--                             onclick="myFunc();"--%>
-                    <%--                             value=" "--%>
-                    <%--                />--%>
+                <input list="languages" name="language" id="language">
+                <datalist id="languages">
+                    <option value="Java">
+                    <option value="C">
+                </datalist>
             </div>
             <div align="center" id="cr">©2019 Lelar</div>
         </div>
@@ -114,6 +118,7 @@
                 />
             </div>
         </div>
+        <html:hidden property="complete" styleId="complete"/>
     </div>
 
     <script>
@@ -130,7 +135,7 @@
 
         function insertTab(o, e) {
             var kC = e.keyCode ? e.keyCode : e.charCode ? e.charCode : e.which;
-            if (kC == 9 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
+            if (kC === 9 && !e.shiftKey && !e.ctrlKey && !e.altKey) {
                 var oS = o.scrollTop;
                 if (o.setSelectionRange) {
                     var sS = o.selectionStart;
@@ -154,5 +159,13 @@
         function getWidthForVars() {
             return $("#vars").width();
         }
+
+        var varsTextarea = document.getElementById("varsInner");
+        varsTextarea.addEventListener('keydown', function (e) {
+            if (e.key === "Enter") {
+                sendVars();
+                varsTextarea.value = '';
+            }
+        });
     </script>
 </html:form>

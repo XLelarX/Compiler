@@ -8,17 +8,15 @@ import exception.CompilerException;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
-import org.apache.struts.actions.DispatchAction;
 import runner.BaseCodeRunner;
+import runner.CCodeRunner;
 import runner.JavaCodeRunner;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class CompileRestService extends DispatchAction
+public class FirstRequestRestService extends BaseRestService
 {
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
@@ -27,17 +25,31 @@ public class CompileRestService extends DispatchAction
 		CompilerForm compilerForm = (CompilerForm) form;
 		fixRequestedData(compilerForm);
 
-		StringBuilder code = new StringBuilder(compilerForm.getRequest());
-		String vars = compilerForm.getVars().replace("\\plus", "+");
+		String code = compilerForm.getRequest()
+				.replace("\\plus", "+")
+				.replace("\\enter", "\n")
+				.replace("\\tab", "\t");
+		compilerForm.setRequest(code);
+		String vars = compilerForm.getVars()
+				.replace("\\plus", "+");
 
 		CompilerEntity compilerEntity;
-		BaseCodeRunner codeRunner = new JavaCodeRunner();
+		BaseCodeRunner codeRunner = null;
+		switch (compilerForm.getLanguage())
+		{
+			case "Java":
+				codeRunner = new JavaCodeRunner();
+				break;
+			case "C":
+				codeRunner = new CCodeRunner();
+		}
+
 
 		GsonBuilder builder = new GsonBuilder();
 		Gson gson = builder.create();
 		try
 		{
-			compilerEntity = codeRunner.start(code.toString(), vars, request);
+			compilerEntity = codeRunner.start(code, vars, request);
 		} catch (CompilerException e)
 		{
 			compilerForm.setResponse(e.getMessage());
@@ -59,13 +71,13 @@ public class CompileRestService extends DispatchAction
 			result.append("Ожидаются данные");
 		} else
 		{
-			compilerEntity.getOut().forEach(line -> result.append(line.replace("+", "\\plus")).append("\r\n"));
-			//compilerEntity.getErrors().forEach(line -> result.append(line.replace("+", "\\plus")).append("\r\n"));
+			compilerEntity.getOut().forEach(
+					line -> result.append(line.replace("+", "\\plus")).append("\r\n")
+			);
 			compilerForm.setComplete(compilerEntity.isCompleted());
 		}
 		String resultString = result.toString();
 		compilerForm.setResponse(resultString);
-		//lastResponse.put(request.getSession().getId(), resultString);
 
 		String jsonString = gson.toJson(compilerForm);
 
@@ -75,15 +87,5 @@ public class CompileRestService extends DispatchAction
 		response.setContentType("application/json");
 
 		return null;
-	}
-
-	private void fixRequestedData(CompilerForm compilerForm)
-	{
-		Pattern p = Pattern.compile("\u200b|\n$");
-		Matcher m = p.matcher(
-				compilerForm.getRequest()
-						.replace("\u00a0", " ")
-						.replace("\\plus", "+"));
-		compilerForm.setRequest(m.replaceAll(""));
 	}
 }

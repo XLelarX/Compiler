@@ -2,6 +2,7 @@ package runner;
 
 import compiler.lelar.compiler.CompilerEntity;
 import exception.CompilerException;
+import utils.ConsoleHelper;
 import logger.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,17 +16,24 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public abstract class BaseCodeRunner
 {
-	final static String PATH = "/Users/Lelar/Desktop/JavaProjects/execution/";
 	final static String EXECUTION_ERRORS = "Execution errors: ";
 	final static String COMPILE_ERRORS = "Compile errors: ";
 	final static String CREATE_ERRORS = "Create errors: ";
 	final static long EXECUTION_TIME = 2000;
 
-	//public static Map<String, AtomicReference<Process>> processes = new HashMap<>();
-	public static Map<String, Process> processes = new HashMap<>();
-	public static Map<String, Thread> threads = new HashMap<>();
-	public volatile static Map<String, List<String>> out = new HashMap<>();
-	public volatile static Map<String, List<String>> in = new HashMap<>();
+	static Map<String, Process> processes = new HashMap<>();
+	volatile static Map<String, List<String>> out = new HashMap<>();
+	volatile static Map<String, String> folderNames = new HashMap<>();
+
+	/**
+	 * Имя папки с исполняемыми файлами
+	 */
+	String folderName;
+
+	/**
+	 * Имя исполняемого файла
+	 */
+	String executionFileName;
 
 	/**
 	 * Компиляция и выполнение программы
@@ -86,16 +94,13 @@ public abstract class BaseCodeRunner
 	public static List<String> readFrom(String sessionId)
 	{
 		Process atomicProcess = processes.get(sessionId);
-//		AtomicReference<Process> atomicProcess = processes.get(sessionId);
 
 		if (atomicProcess != null)
 		{
-			//Process process = atomicProcess;
-
 			List<String> output = new ArrayList<>();
 			out.put(sessionId, output);
 			BufferedReader reader = new BufferedReader(new InputStreamReader(atomicProcess.getInputStream()));//process.getInputStream()));
-			Thread thread1 =
+			Thread thread =
 					new Thread(() -> {
 						try
 						{
@@ -108,53 +113,13 @@ public abstract class BaseCodeRunner
 							Logger.fillLog(e);
 						}
 					});
-			thread1.setPriority(6);
-			thread1.start();
-			threads.put(sessionId, thread1);
+			thread.setPriority(6);
+			thread.start();
 
 			long time = System.currentTimeMillis();
-			while (thread1.isAlive() && System.currentTimeMillis() - time < EXECUTION_TIME)
+			while (thread.isAlive() && System.currentTimeMillis() - time < EXECUTION_TIME)
 			{
 			}
-			//thread.interrupt();
-
-
-//		try
-//		{
-//			ExecutorService executorService = Executors.newSingleThreadExecutor();
-//			//AtomicReference<CompilerEntity> atomicCompilerEntity = new AtomicReference<>();
-//
-//
-//
-//			try
-//			{
-//				executorService.submit(() -> {
-//					try
-//					{
-//						String line;
-//						while ((line = reader.readLine()) != null)
-//							out.add(line);
-//					} catch (IOException e)
-//					{
-//						Logger.fillLog(e);
-//					}
-//				}).get(2000, TimeUnit.SECONDS);// attempt the task for two minutes
-//			} catch (InterruptedException | TimeoutException | ExecutionException e)
-//			{
-//				throw new CompilerException(EXECUTION_ERRORS + '\n' + e);
-//			} finally
-//			{
-//				executorService.shutdown();
-//			}
-//
-//
-//			//reader.close();
-//		} catch (Exception e)
-//		{
-//			Logger.fillLog(e);
-//		}
-
-			//thread.interrupt();
 			return output;
 		}
 
@@ -178,49 +143,18 @@ public abstract class BaseCodeRunner
 			throws IOException
 	{
 		Process atomicProcess = processes.get(sessionId);
-//		AtomicReference<Process> atomicProcess = processes.get(sessionId);
 
 		if (atomicProcess != null)
 		{
-			//in.put(sessionId, input);
 
 			BufferedWriter writer =
 					new BufferedWriter(new OutputStreamWriter(atomicProcess.getOutputStream()));
-
-//			Thread thread = new Thread(() -> {
-//				Process process = processes.get(sessionId).get();
-//				while (process.isAlive())
-//				{
-//					List<String> line = in.get(sessionId);
-//
-//					try
-//					{
 			for (String s : input)
 			{
 				writer.write(s);
 				writer.newLine();
 				writer.flush();
-				//line.remove(s);
 			}
-//					} catch (IOException e)
-//					{
-//						e.printStackTrace();
-//					}
-//				}
-//			});
-//			thread.setPriority(7);
-//			thread.start();
-//			input.forEach(inputString -> {
-//				try
-//				{
-//					bufferedWriterHashMap.get(sessionId).write(inputString);
-//					bufferedWriterHashMap.get(sessionId).newLine();
-//					bufferedWriterHashMap.get(sessionId).flush();
-//				} catch (IOException e)
-//				{
-//					e.printStackTrace();
-//				}
-//			});
 		}
 	}
 
@@ -244,7 +178,7 @@ public abstract class BaseCodeRunner
 	 * @return - Имя папки с исполняемыми файлами
 	 * @throws IOException - Ошибка при чтении из стрима
 	 */
-	String createFolder(String executionFileName, String sessionId) throws IOException
+	String createFolder(String executionFileName) throws IOException
 	{
 		Process process;
 		List<String> mkdirErr;
@@ -253,22 +187,26 @@ public abstract class BaseCodeRunner
 		do
 		{
 			folderName = executionFileName + Math.round(Math.random() * 100);
-			process = new ProcessBuilder("mkdir", PATH + folderName).start();
-			mkdirErr = readFrom(process);//TODO Поменять
+			process = ConsoleHelper.createDirectoryWith(folderName).start();
+			mkdirErr = readFrom(process);
 		}
-		while (!mkdirErr.isEmpty() && mkdirErr.get(0).equals("mkdir: " + PATH + folderName + ": File exists"));
+		while (!mkdirErr.isEmpty() && ConsoleHelper.directoryIsExists(mkdirErr, folderName));
 
 		return folderName;
 	}
 
-	public static List<String> getResultFor(String sessionId)
+	public static Map<String, String> getFolderNames()
 	{
-		return out.get(sessionId);
+		return folderNames;
 	}
 
-
-	public static void removeTemporaryData(String folderName) throws IOException
+	public static Map<String, Process> getProcesses()
 	{
-		new ProcessBuilder("rm", "-R", PATH + folderName).start();
+		return processes;
+	}
+
+	public static Map<String, List<String>> getOut()
+	{
+		return out;
 	}
 }
