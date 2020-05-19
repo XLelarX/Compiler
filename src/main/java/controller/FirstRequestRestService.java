@@ -11,6 +11,7 @@ import org.apache.struts.action.ActionMapping;
 import runner.BaseCodeRunner;
 import runner.CCodeRunner;
 import runner.JavaCodeRunner;
+import runner.OberonCodeRunner;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,10 +29,17 @@ public class FirstRequestRestService extends BaseRestService
 		String code = compilerForm.getRequest()
 				.replace("\\plus", "+")
 				.replace("\\enter", "\n")
-				.replace("\\tab", "\t");
+				.replace("\\tab", "\t")
+				.replace("\\cell", "#")
+				.replace("\\percent", "%")
+				.replace("\\and", "&");
 		compilerForm.setRequest(code);
 		String vars = compilerForm.getVars()
-				.replace("\\plus", "+");
+				.replace("\\plus", "+")
+				.replace("\\tab", "\t")
+				.replace("\\cell", "#")
+				.replace("\\percent", "%")
+				.replace("\\and", "&");
 
 		CompilerEntity compilerEntity;
 		BaseCodeRunner codeRunner = null;
@@ -40,13 +48,16 @@ public class FirstRequestRestService extends BaseRestService
 			case "Java":
 				codeRunner = new JavaCodeRunner();
 				break;
+			case "Oberon":
+				codeRunner = new OberonCodeRunner();
+				break;
 			case "C":
 				codeRunner = new CCodeRunner();
 		}
 
-
 		GsonBuilder builder = new GsonBuilder();
 		Gson gson = builder.create();
+
 		try
 		{
 			compilerEntity = codeRunner.start(code, vars, request);

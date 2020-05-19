@@ -21,12 +21,20 @@ public class JavaCodeRunner extends BaseCodeRunner
 	{
 		prepareExecutionFile(code);
 
+		long compileTime = System.currentTimeMillis();
 		List<String> errList = compileCode();
+		compileTime = System.currentTimeMillis() - compileTime;
 
 		CompilerEntity outEntity;
+		long executionTime = 0;
 		if (errList.isEmpty())
 		{
+			executionTime = System.currentTimeMillis();
 			outEntity = executeCode(vars, sessionId);
+			if (outEntity.isCompleted())
+			{
+				executionTime = System.currentTimeMillis() - executionTime;
+			}
 		} else
 		{
 			errList.add(0, COMPILE_ERRORS);
@@ -36,11 +44,15 @@ public class JavaCodeRunner extends BaseCodeRunner
 
 		if (outEntity.isCompleted())
 		{
+			outEntity.getOut().add(0, "Compile time: " + compileTime / 1000 + " sec");
+			outEntity.getOut().add("Execution time: " + executionTime);
 			processes.remove(sessionId);
 			out.remove(sessionId);
 			ConsoleHelper.deleteTemporaryData(folderName);
 		} else
 		{
+			out.get(sessionId).add(0, "Compile time: " + compileTime / 1000 + " sec");
+			executionTimes.put(sessionId, executionTime);
 			folderNames.put(sessionId, folderName);
 		}
 

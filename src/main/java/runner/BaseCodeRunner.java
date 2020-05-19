@@ -24,6 +24,7 @@ public abstract class BaseCodeRunner
 	static Map<String, Process> processes = new HashMap<>();
 	volatile static Map<String, List<String>> out = new HashMap<>();
 	volatile static Map<String, String> folderNames = new HashMap<>();
+	volatile static Map<String, Long> executionTimes = new HashMap<>();
 
 	/**
 	 * Имя папки с исполняемыми файлами
@@ -146,9 +147,9 @@ public abstract class BaseCodeRunner
 
 		if (atomicProcess != null)
 		{
-
 			BufferedWriter writer =
 					new BufferedWriter(new OutputStreamWriter(atomicProcess.getOutputStream()));
+
 			for (String s : input)
 			{
 				writer.write(s);
@@ -208,5 +209,10 @@ public abstract class BaseCodeRunner
 	public static Map<String, List<String>> getOut()
 	{
 		return out;
+	}
+
+	public static Map<String, Long> getExecutionTimes()
+	{
+		return executionTimes;
 	}
 }

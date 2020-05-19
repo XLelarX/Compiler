@@ -30,21 +30,12 @@ public class GetResultRestService extends BaseRestService
 			StringBuilder result = new StringBuilder();
 			BaseCodeRunner.getOut().get(sessionId)
 					.forEach(line -> result.append(line.replace("+", "\\plus")).append("\r\n"));
+			result.append("Execution time: ").append((System.currentTimeMillis() - BaseCodeRunner.getExecutionTimes().get(sessionId)) / 1000).append("sec");
 
 			if (!sessionProcess.isAlive())
 			{
 				compilerForm.setComplete(true);
 			}
-
-			compilerForm.setResponse(result.toString());
-
-			GsonBuilder builder = new GsonBuilder();
-			Gson gson = builder.create();
-			String jsonString = gson.toJson(compilerForm);
-
-			PrintWriter writer = response.getWriter();
-			writer.print(jsonString);
-			writer.flush();
 
 			if (!sessionProcess.isAlive())
 			{
@@ -58,8 +49,19 @@ public class GetResultRestService extends BaseRestService
 				{
 					ConsoleHelper.deleteTemporaryData(folderName);
 				}
+
+				BaseCodeRunner.getExecutionTimes().remove(sessionId);
 			}
 
+			compilerForm.setResponse(result.toString());
+
+			GsonBuilder builder = new GsonBuilder();
+			Gson gson = builder.create();
+			String jsonString = gson.toJson(compilerForm);
+
+			PrintWriter writer = response.getWriter();
+			writer.print(jsonString);
+			writer.flush();
 		}
 
 		response.setContentType("application/json");

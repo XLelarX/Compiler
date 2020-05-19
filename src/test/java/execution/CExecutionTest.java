@@ -2,6 +2,7 @@ package execution;
 
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import runner.BaseCodeRunner;
@@ -10,10 +11,17 @@ import utils.ConsoleHelper;
 import java.io.IOException;
 import java.util.List;
 
-public class CExecutionTest
+public class CExecutionTest extends BaseExecutionTest
 {
 	private static final String SESSION_ID = "testSessionId";
 	private static Process process;
+
+	@BeforeAll
+	static void compile() throws IOException, InterruptedException
+	{
+		ConsoleHelper.compileTestC("ExecutionTest").start();
+		Thread.sleep(1000);
+	}
 
 	@BeforeEach
 	void init() throws IOException
@@ -21,7 +29,6 @@ public class CExecutionTest
 		ProcessBuilder builder = ConsoleHelper.executeTestC("ExecutionTest");
 		builder.redirectErrorStream(true);
 		process = builder.start();
-		builder.redirectError().file();
 	}
 
 	@Test

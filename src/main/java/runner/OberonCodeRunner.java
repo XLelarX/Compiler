@@ -4,9 +4,7 @@ import compiler.lelar.compiler.CompilerEntity;
 import exception.CompilerException;
 import utils.ConsoleHelper;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -15,7 +13,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicReference;
 
-public class CCodeRunner extends BaseCodeRunner
+public class OberonCodeRunner extends BaseCodeRunner
 {
 	@Override
 	CompilerEntity run(String code, String vars, String sessionId)
@@ -29,19 +27,19 @@ public class CCodeRunner extends BaseCodeRunner
 
 		CompilerEntity outEntity;
 		long executionTime = 0;
-		if (errList.isEmpty())
+		if (errList.size() == 1)
 		{
-			executionTime = System.currentTimeMillis();
 			outEntity = executeCode(vars, sessionId);
-			if (outEntity.isCompleted())
-			{
-				executionTime = System.currentTimeMillis() - executionTime;
-			}
 		} else
 		{
 			errList.add(0, COMPILE_ERRORS);
 
+			executionTime = System.currentTimeMillis();
 			outEntity = new CompilerEntity(Collections.emptyList(), errList, true);
+			if (outEntity.isCompleted())
+			{
+				executionTime = System.currentTimeMillis() - executionTime;
+			}
 		}
 
 		if (outEntity.isCompleted())
@@ -54,7 +52,6 @@ public class CCodeRunner extends BaseCodeRunner
 		} else
 		{
 			out.get(sessionId).add(0, "Compile time: " + compileTime / 1000 + " sec");
-			executionTimes.put(sessionId, executionTime);
 			folderNames.put(sessionId, folderName);
 		}
 
@@ -66,14 +63,14 @@ public class CCodeRunner extends BaseCodeRunner
 	 *
 	 * @param code - Код программы
 	 * @throws IOException
-	 * @throws CompilerException - Ошибкаы создания файла
+	 * @throws CompilerException - Ошибка создания файла
 	 */
 	private void prepareExecutionFile(String code) throws IOException, CompilerException
 	{
-		executionFileName = "ExecutionFile";//extractExecutionFileName(code);
+		executionFileName = extractExecutionFileName(code);
 		folderName = createFolder(executionFileName);
 
-		File newFile = ConsoleHelper.createCFile(folderName, executionFileName);
+		File newFile = ConsoleHelper.createOberonFile(folderName, executionFileName);
 
 		if (!newFile.createNewFile())
 		{
@@ -96,7 +93,7 @@ public class CCodeRunner extends BaseCodeRunner
 	{
 		AtomicReference<Process> process = new AtomicReference<>();
 		ProcessBuilder processBuilder =
-				ConsoleHelper.executeC(folderName, executionFileName);
+				ConsoleHelper.executeOberon(folderName, executionFileName);
 		processBuilder.redirectErrorStream(true);
 
 		ExecutorService executor = Executors.newCachedThreadPool();
@@ -151,7 +148,13 @@ public class CCodeRunner extends BaseCodeRunner
 	private List<String> compileCode() throws IOException
 	{
 		AtomicReference<Process> process = new AtomicReference<>();
-		ProcessBuilder processBuilder = ConsoleHelper.compileC(folderName, executionFileName);
+
+		Process innerProcess = new ProcessBuilder("pwd").start();
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(innerProcess.getInputStream()));
+		String sourcePath = reader.readLine();
+
+		ProcessBuilder processBuilder = ConsoleHelper.compileOberon(folderName, executionFileName);
 		ExecutorService executor = Executors.newCachedThreadPool();
 
 		executor.submit(
@@ -165,6 +168,7 @@ public class CCodeRunner extends BaseCodeRunner
 		while (!executor.isTerminated())
 		{
 		}
+		new ProcessBuilder("cp", sourcePath + "/" + executionFileName, "/Users/Lelar/Desktop/JavaProjects/execution/" + folderName + "/").start();
 
 		return readFrom(process.get());
 	}
@@ -178,9 +182,9 @@ public class CCodeRunner extends BaseCodeRunner
 	private String extractExecutionFileName(String code) throws CompilerException
 	{
 		StringBuilder className = new StringBuilder();
-		int indexOfClassName = code.indexOf("class ") + 5;
+		int indexOfClassName = code.indexOf("MODULE ") + 6;
 
-		if (indexOfClassName == 4)
+		if (indexOfClassName == 5)
 		{
 			throw new CompilerException(CREATE_ERRORS + "\n   Code textarea is empty");
 		}
@@ -188,7 +192,7 @@ public class CCodeRunner extends BaseCodeRunner
 		while (code.charAt(indexOfClassName) == ' ')
 			indexOfClassName++;
 
-		while ((code.charAt(indexOfClassName) != '{') && (code.charAt(indexOfClassName) != '\r') &&
+		while ((code.charAt(indexOfClassName) != ';') && (code.charAt(indexOfClassName) != '\r') &&
 				(code.charAt(indexOfClassName) != '\n') && (code.charAt(indexOfClassName) != ' '))
 		{
 			className.append(code.charAt(indexOfClassName));

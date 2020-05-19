@@ -1,7 +1,9 @@
 package utils;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 public class ConsoleHelper
@@ -10,6 +12,7 @@ public class ConsoleHelper
 	private static final String TESTS_PATH = "/Users/Lelar/Desktop/JavaProjects/test/ExecutionTest/";
 	private static final String JAVA_FILE_FORMAT = ".java";
 	private static final String C_FILE_FORMAT = ".c";
+	private static final String OBERON_FILE_FORMAT = ".mod";
 
 	public static ProcessBuilder createDirectoryWith(String name)
 	{
@@ -41,6 +44,11 @@ public class ConsoleHelper
 		return new ProcessBuilder(PATH + folderName + "/" + fileName);
 	}
 
+	public static ProcessBuilder executeOberon(String folderName, String fileName)
+	{
+		return new ProcessBuilder(PATH + folderName + "/" + fileName);
+	}
+
 	public static ProcessBuilder executeTestJava(String fileName)
 	{
 		return new ProcessBuilder("java", "-cp", TESTS_PATH + "java/", fileName);
@@ -51,16 +59,57 @@ public class ConsoleHelper
 		return new ProcessBuilder(TESTS_PATH + "c/" + fileName);
 	}
 
+	public static ProcessBuilder executeTestOberon(String fileName)
+	{
+		return new ProcessBuilder(TESTS_PATH + "oberon/" + fileName);
+	}
+
 	public static ProcessBuilder compileJava(String folderName, String fileName)
 	{
 		return new ProcessBuilder("javac", PATH + folderName + "/" + fileName + JAVA_FILE_FORMAT);
 	}
 
+	public static ProcessBuilder compileTestJava(String fileName)
+	{
+		return new ProcessBuilder("javac", TESTS_PATH + "java/" + fileName + JAVA_FILE_FORMAT);
+	}
+
 	public static ProcessBuilder compileC(String folderName, String fileName)
 	{
 		return new ProcessBuilder(
-				"gcc -o " + fileName + " " + PATH + folderName + "/" + fileName + C_FILE_FORMAT
+				"gcc", PATH + folderName + "/" + fileName + C_FILE_FORMAT, "-o", PATH + folderName + "/" + fileName
 		);
+	}
+
+	public static ProcessBuilder compileTestC(String fileName)
+	{
+		return new ProcessBuilder(
+				"gcc", TESTS_PATH + "c/" + fileName + C_FILE_FORMAT, "-o", TESTS_PATH + "c/" + fileName
+		);
+	}
+
+	public static ProcessBuilder compileOberon(String folderName, String fileName)
+	{
+		return new ProcessBuilder(
+				"/Users/Lelar/Desktop/Oberon/voc/install/bin/voc",
+				PATH + folderName + "/" + fileName + ".mod", "-m"
+		);
+	}
+
+	public static Process compileTestOberon(String fileName) throws IOException
+	{
+		Process innerProcess = new ProcessBuilder("pwd").start();
+
+		BufferedReader reader = new BufferedReader(new InputStreamReader(innerProcess.getInputStream()));
+		String sourcePath = reader.readLine();
+
+		innerProcess = new ProcessBuilder(
+				"/Users/Lelar/Desktop/Oberon/voc/install/bin/voc",
+				TESTS_PATH + "oberon/" + fileName + ".mod", "-m"
+		).start();
+		new ProcessBuilder("cp", sourcePath + "/ExecutionTest", TESTS_PATH).start();
+
+		return innerProcess;
 	}
 
 	public static File createJavaFile(String folderName, String fileName)
@@ -71,5 +120,10 @@ public class ConsoleHelper
 	public static File createCFile(String folderName, String fileName)
 	{
 		return new File(PATH + folderName + "/" + fileName + C_FILE_FORMAT);
+	}
+
+	public static File createOberonFile(String folderName, String fileName)
+	{
+		return new File(PATH + folderName + "/" + fileName + OBERON_FILE_FORMAT);
 	}
 }

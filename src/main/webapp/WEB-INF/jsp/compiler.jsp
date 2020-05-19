@@ -27,7 +27,12 @@
                         var sendingCode = "";
                         var elementList = document.getElementsByClassName("CodeMirror-line");
                         for (var i = 0; i < elementList.length; i++) {
-                            sendingCode += elementList[i].innerText.split("+").join("\\plus").split("\t").join("\\tab") + "\\enter";
+                            sendingCode += elementList[i].innerText
+                                .split("+").join("\\plus")
+                                .split("\t").join("\\tab")
+                                .split("#").join("\\cell")
+                                .split("%").join("\\percent")
+                                .split("&").join("\\and") + "\\enter";
                         }
                         alert(sendingCode);
                         $.ajax({
@@ -35,7 +40,11 @@
                             url: 'compileAjax.do',
                             data: "request=" + sendingCode
                                 + "&language=" + document.getElementById("language").value
-                                + "&vars=" + document.getElementById("varsInner").value.split("+").join("\\plus"),
+                                + "&vars=" + document.getElementById("varsInner").value
+                                    .split("+").join("\\plus")
+                                    .split("#").join("\\cell")
+                                    .split("%").join("\\percent")
+                                    .split("&").join("\\and"),
                             dataType: 'json',
                             success:
                                 function (data) {
@@ -55,7 +64,11 @@
                             $.ajax({
                                 type: 'GET',
                                 url: 'sendVars.do',
-                                data: "vars=" + document.getElementById("varsInner").value.split("+").join("\\plus"),
+                                data: "vars=" + document.getElementById("varsInner").value
+                                    .split("+").join("\\plus")
+                                    .split("#").join("\\cell")
+                                    .split("%").join("\\percent")
+                                    .split("&").join("\\and"),
                                 dataType: 'json',
                                 success:
                                     function (data) {
@@ -97,6 +110,7 @@
                 <datalist id="languages">
                     <option value="Java">
                     <option value="C">
+                    <option value="Oberon">
                 </datalist>
             </div>
             <div align="center" id="cr">©2019 Lelar</div>

@@ -1,27 +1,36 @@
 package execution;
 
 import com.google.common.collect.ImmutableList;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import runner.BaseCodeRunner;
 import utils.ConsoleHelper;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-public class JavaExecutionTest
+public class JavaExecutionTest extends BaseExecutionTest
 {
-	private static final String SESSION_ID = "testSessionId";
-	private static Process process;
+	@BeforeAll
+	static void compile() throws InterruptedException
+	{
+		ConsoleHelper.compileTestJava(fileName);
+		Thread.sleep(1000);
+	}
 
 	@BeforeEach
 	void init() throws IOException
 	{
-		ProcessBuilder builder = ConsoleHelper.executeTestJava("ExecutionTest");
+		ProcessBuilder builder = ConsoleHelper.executeTestJava(fileName);
 		builder.redirectErrorStream(true);
 		process = builder.start();
 		builder.redirectError().file();
+	}
+
+	@AfterAll
+	static void delete()
+	{
+		new File(TESTS_PATH + "java/" + fileName + ".class").delete();
 	}
 
 	@Test
