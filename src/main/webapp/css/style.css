@@ -82,6 +82,14 @@ textarea {
     display: block;
 }
 
+#language {
+    margin-right:auto;
+    margin-left:auto;
+    margin-top: 10px;
+    align-items: center;
+    display: flex;
+}
+
 #logo {
     font-family: 'Staatliches', cursive;
     font-size: 25px;

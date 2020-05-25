@@ -11,7 +11,6 @@
         <link href="<c:url value="/css/style.css"/>" rel="stylesheet">
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.min.js"></script>
         <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
-            <%--        <script src="dist/set-number.min.js"></script>--%>
         <script type="text/javascript" src="${pageContext.request.contextPath}/js/script.js"></script>
         <script src="http://codemirror.net/lib/codemirror.js"></script>
         <script src="http://codemirror.net/mode/javascript/javascript.js"></script>
@@ -28,28 +27,42 @@
                         var elementList = document.getElementsByClassName("CodeMirror-line");
                         for (var i = 0; i < elementList.length; i++) {
                             sendingCode += elementList[i].innerText
-                                .split("+").join("\\plus")
-                                .split("\t").join("\\tab")
-                                .split("#").join("\\cell")
-                                .split("%").join("\\percent")
-                                .split("&").join("\\and") + "\\enter";
+                                .split("+").join("/plus")
+                                .split("\t").join("/tab")
+                                .split("#").join("/cell")
+                                .split("%").join("/percent")
+                                .split("&").join("/and")
+                                .split("{").join("/lcb")
+                                .split("}").join("/rcb")
+                                .split("[").join("/lbb")
+                                .split("]").join("/rbb")
+                                .split("\\").join("/slash") + "/enter";
                         }
-                        alert(sendingCode);
+
+                        var varz = document.getElementById("varsInner").value
+                            .split("+").join("/plus")
+                            .split("#").join("/cell")
+                            .split("%").join("/percent")
+                            .split("&").join("/and")
+                            .split("{").join("/lcb")
+                            .split("}").join("/rcb")
+                            .split("[").join("/lbb")
+                            .split("]").join("/rbb")
+                            .split("\\").join("/slash");
+
+                        document.getElementById("varsInner").value = '';
+
                         $.ajax({
                             type: 'GET',
                             url: 'compileAjax.do',
                             data: "request=" + sendingCode
                                 + "&language=" + document.getElementById("language").value
-                                + "&vars=" + document.getElementById("varsInner").value
-                                    .split("+").join("\\plus")
-                                    .split("#").join("\\cell")
-                                    .split("%").join("\\percent")
-                                    .split("&").join("\\and"),
+                                + "&vars=" + varz,
                             dataType: 'json',
                             success:
                                 function (data) {
                                     document.getElementById("innerResponse").value
-                                        = data.response.split("\\plus").join("+");
+                                        = data.response.split("/plus").join("+");
                                     var isCompleted = data.complete;
                                     if (!isCompleted) {
                                         document.getElementById("complete").value = isCompleted;
@@ -65,15 +78,20 @@
                                 type: 'GET',
                                 url: 'sendVars.do',
                                 data: "vars=" + document.getElementById("varsInner").value
-                                    .split("+").join("\\plus")
-                                    .split("#").join("\\cell")
-                                    .split("%").join("\\percent")
-                                    .split("&").join("\\and"),
+                                    .split("+").join("/plus")
+                                    .split("#").join("/cell")
+                                    .split("%").join("/percent")
+                                    .split("&").join("/and")
+                                    .split("{").join("/lcb")
+                                    .split("}").join("/rcb")
+                                    .split("[").join("/lbb")
+                                    .split("]").join("/rbb")
+                                    .split("\\").join("/slash"),
                                 dataType: 'json',
                                 success:
                                     function (data) {
                                         document.getElementById("innerResponse").value
-                                            += data.response.split("\\plus").join("+");
+                                            += data.response.split("/plus").join("+");
                                     }
                             });
                         }
@@ -88,7 +106,7 @@
                                 success:
                                     function (data) {
                                         document.getElementById("innerResponse").value
-                                            = data.response.split("\\plus").join("+");
+                                            = data.response.split("/plus").join("+");
 
                                         var isCompleted = data.complete;
                                         if (!isCompleted)
@@ -99,19 +117,17 @@
                             });
                         }
                     }
-
                 </script>
                 <html:button property="sender1"
                              style="background-image: url('${pageContext.request.contextPath}/img/run.jpg')"
                              styleClass="button"
                              onclick="sendData();"
                              value=" "/>
-                <input list="languages" name="language" id="language">
-                <datalist id="languages">
-                    <option value="Java">
-                    <option value="C">
-                    <option value="Oberon">
-                </datalist>
+                <select id="language">
+                    <option>Java</option>
+                    <option>C</option>
+                    <option>Oberon</option>
+                </select>
             </div>
             <div align="center" id="cr">©2019 Lelar</div>
         </div>
@@ -142,9 +158,9 @@
             autofocus: true
         });
 
-        editor.setCursor(2, 2);     // это значит поместить курсор на 3 строку (отсчёт от 0), символ 3
+        editor.setCursor(2, 2);
 
-        var pos = editor.posFromIndex(3);  //получить координаты 3-ей позиции (строку и символ)
+        var pos = editor.posFromIndex(3);
         editor.setCursor(pos.line, pos.ch);
 
         function insertTab(o, e) {

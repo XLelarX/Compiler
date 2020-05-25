@@ -2,7 +2,7 @@ package runner;
 
 import compiler.lelar.compiler.CompilerEntity;
 import exception.CompilerException;
-import utils.ConsoleHelper;
+import utils.TerminalHelper;
 
 import java.io.*;
 import java.util.Collections;
@@ -29,29 +29,30 @@ public class OberonCodeRunner extends BaseCodeRunner
 		long executionTime = 0;
 		if (errList.size() == 1)
 		{
-			outEntity = executeCode(vars, sessionId);
-		} else
-		{
-			errList.add(0, COMPILE_ERRORS);
-
 			executionTime = System.currentTimeMillis();
-			outEntity = new CompilerEntity(Collections.emptyList(), errList, true);
+			outEntity = executeCode(vars, sessionId);
 			if (outEntity.isCompleted())
 			{
 				executionTime = System.currentTimeMillis() - executionTime;
 			}
+		} else
+		{
+			errList.add(0, COMPILE_ERRORS);
+			TerminalHelper.deleteTemporaryData(folderName);
+			return new CompilerEntity(errList, true);
 		}
 
 		if (outEntity.isCompleted())
 		{
 			outEntity.getOut().add(0, "Compile time: " + compileTime / 1000 + " sec");
-			outEntity.getOut().add("Execution time: " + executionTime);
+			outEntity.getOut().add("Execution time: " + executionTime / 1000 + " sec");
 			processes.remove(sessionId);
 			out.remove(sessionId);
-			ConsoleHelper.deleteTemporaryData(folderName);
+			TerminalHelper.deleteTemporaryData(folderName);
 		} else
 		{
 			out.get(sessionId).add(0, "Compile time: " + compileTime / 1000 + " sec");
+			executionTimes.put(sessionId, executionTime);
 			folderNames.put(sessionId, folderName);
 		}
 
@@ -70,11 +71,12 @@ public class OberonCodeRunner extends BaseCodeRunner
 		executionFileName = extractExecutionFileName(code);
 		folderName = createFolder(executionFileName);
 
-		File newFile = ConsoleHelper.createOberonFile(folderName, executionFileName);
+		File newFile = TerminalHelper.createOberonFile(folderName, executionFileName);
+		TerminalHelper.modifyFileWith(folderName + "/" + executionFileName + ".mod").start();
 
 		if (!newFile.createNewFile())
 		{
-			throw new CompilerException("File don't exists");
+			throw new CompilerException("Cant create new file");
 		}
 
 		FileOutputStream fileOutputStream = new FileOutputStream(newFile);
@@ -93,7 +95,7 @@ public class OberonCodeRunner extends BaseCodeRunner
 	{
 		AtomicReference<Process> process = new AtomicReference<>();
 		ProcessBuilder processBuilder =
-				ConsoleHelper.executeOberon(folderName, executionFileName);
+				TerminalHelper.executeOberon(folderName, executionFileName);
 		processBuilder.redirectErrorStream(true);
 
 		ExecutorService executor = Executors.newCachedThreadPool();
@@ -137,7 +139,7 @@ public class OberonCodeRunner extends BaseCodeRunner
 			output = readFrom(sessionId);
 		}
 
-		return new CompilerEntity(output, Collections.emptyList(), complete);
+		return new CompilerEntity(output, complete);
 	}
 
 	/**
@@ -154,21 +156,30 @@ public class OberonCodeRunner extends BaseCodeRunner
 		BufferedReader reader = new BufferedReader(new InputStreamReader(innerProcess.getInputStream()));
 		String sourcePath = reader.readLine();
 
-		ProcessBuilder processBuilder = ConsoleHelper.compileOberon(folderName, executionFileName);
-		ExecutorService executor = Executors.newCachedThreadPool();
+		ProcessBuilder processBuilder = TerminalHelper.compileOberon(folderName, executionFileName);
+		processBuilder.redirectErrorStream(true);
+		//ExecutorService executor = Executors.newCachedThreadPool();
 
-		executor.submit(
-				new FutureTask(
-						(Callable<Integer>) () -> {
-							process.set(processBuilder.start());
-							return process.get().waitFor();
-						})
-		);
-		executor.shutdown();
-		while (!executor.isTerminated())
+//		executor.submit(
+//				new FutureTask(
+//						(Callable<Integer>) () -> {
+//							process.set(processBuilder.start());
+//							return process.get().waitFor();
+//						})
+//		);
+//		executor.shutdown();
+//		while (!executor.isTerminated())
+//		{
+//		}
+		process.set(processBuilder.start());
+		while (process.get().isAlive())
 		{
 		}
-		new ProcessBuilder("cp", sourcePath + "/" + executionFileName, "/Users/Lelar/Desktop/JavaProjects/execution/" + folderName + "/").start();
+
+		//new ProcessBuilder("cp", sourcePath + executionFileName, ConsoleHelper.PATH + folderName + "/").start();
+		new ProcessBuilder("cp", sourcePath + "/" + executionFileName, TerminalHelper.PATH + folderName + "/").start();
+		new ProcessBuilder("rm", sourcePath + executionFileName + ".c").start();
+		new ProcessBuilder("rm", sourcePath + executionFileName).start();
 
 		return readFrom(process.get());
 	}

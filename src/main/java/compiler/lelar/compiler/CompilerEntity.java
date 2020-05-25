@@ -23,10 +23,15 @@ public class CompilerEntity
 	 */
 	private boolean completed;
 
-	public CompilerEntity(List<String> out, List<String> errors)
+	public CompilerEntity(List<String> out, boolean completed)
 	{
 		this.out = out;
-		this.errors = errors;
+		this.completed = completed;
+	}
+
+	public CompilerEntity(List<String> out)
+	{
+		this.out = out;
 	}
 
 	public CompilerEntity()

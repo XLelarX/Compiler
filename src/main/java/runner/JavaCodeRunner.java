@@ -2,7 +2,7 @@ package runner;
 
 import compiler.lelar.compiler.CompilerEntity;
 import exception.CompilerException;
-import utils.ConsoleHelper;
+import utils.TerminalHelper;
 
 import java.io.*;
 import java.util.Collections;
@@ -38,17 +38,17 @@ public class JavaCodeRunner extends BaseCodeRunner
 		} else
 		{
 			errList.add(0, COMPILE_ERRORS);
-
-			outEntity = new CompilerEntity(Collections.emptyList(), errList, true);
+			TerminalHelper.deleteTemporaryData(folderName);
+			return new CompilerEntity(errList, true);
 		}
 
 		if (outEntity.isCompleted())
 		{
 			outEntity.getOut().add(0, "Compile time: " + compileTime / 1000 + " sec");
-			outEntity.getOut().add("Execution time: " + executionTime);
+			outEntity.getOut().add("Execution time: " + executionTime / 1000 + " sec");
 			processes.remove(sessionId);
 			out.remove(sessionId);
-			ConsoleHelper.deleteTemporaryData(folderName);
+			TerminalHelper.deleteTemporaryData(folderName);
 		} else
 		{
 			out.get(sessionId).add(0, "Compile time: " + compileTime / 1000 + " sec");
@@ -71,7 +71,7 @@ public class JavaCodeRunner extends BaseCodeRunner
 		executionFileName = extractExecutionFileName(code);
 		folderName = createFolder(executionFileName);
 
-		File newFile = ConsoleHelper.createJavaFile(folderName, executionFileName);
+		File newFile = TerminalHelper.createJavaFile(folderName, executionFileName);
 
 		if (!newFile.createNewFile())
 		{
@@ -94,7 +94,7 @@ public class JavaCodeRunner extends BaseCodeRunner
 	{
 		AtomicReference<Process> process = new AtomicReference<>();
 		ProcessBuilder processBuilder =
-				ConsoleHelper.executeJava(folderName, executionFileName);
+				TerminalHelper.executeJava(folderName, executionFileName);
 		processBuilder.redirectErrorStream(true);
 
 		ExecutorService executor = Executors.newCachedThreadPool();
@@ -138,6 +138,14 @@ public class JavaCodeRunner extends BaseCodeRunner
 			output = readFrom(sessionId);
 		}
 
+		if (output.contains("NOTE: Picked up JDK_JAVA_OPTIONS:  " +
+				"--add-opens=java.base/java.lang=ALL-UNNAMED " +
+				"--add-opens=java.base/java.io=ALL-UNNAMED " +
+				"--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"))
+		{
+			output.remove(0);
+		}
+
 		return new CompilerEntity(output, Collections.emptyList(), complete);
 	}
 
@@ -149,7 +157,8 @@ public class JavaCodeRunner extends BaseCodeRunner
 	private List<String> compileCode() throws IOException
 	{
 		AtomicReference<Process> process = new AtomicReference<>();
-		ProcessBuilder processBuilder = ConsoleHelper.compileJava(folderName, executionFileName);
+		ProcessBuilder processBuilder = TerminalHelper.compileJava(folderName, executionFileName);
+		processBuilder.redirectErrorStream(true);
 		ExecutorService executor = Executors.newCachedThreadPool();
 
 		executor.submit(

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import runner.BaseCodeRunner;
-import utils.ConsoleHelper;
+import utils.TerminalHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,7 +28,7 @@ public class OberonExecutionTest
 		BufferedReader reader = new BufferedReader(new InputStreamReader(innerProcess.getInputStream()));
 		String sourcePath = reader.readLine();
 
-		ConsoleHelper.compileTestOberon("ExecutionTest");
+		TerminalHelper.compileTestOberon("ExecutionTest");
 
 		new ProcessBuilder("cp", sourcePath + "/ExecutionTest", TESTS_PATH).start();
 	}
@@ -36,7 +36,7 @@ public class OberonExecutionTest
 	@BeforeEach
 	void init() throws IOException
 	{
-		ProcessBuilder builder = ConsoleHelper.executeTestOberon("ExecutionTest");
+		ProcessBuilder builder = TerminalHelper.executeTestOberon("ExecutionTest");
 		builder.redirectErrorStream(true);
 		process = builder.start();
 		builder.redirectError().file();
@@ -51,7 +51,7 @@ public class OberonExecutionTest
 
 		List<String> stdout = BaseCodeRunner.getOut().get(SESSION_ID);
 
-		ConsoleHelper.killProcess(process.pid());
+		TerminalHelper.killProcess(process.pid());
 
 		checkResult(stdout);
 	}

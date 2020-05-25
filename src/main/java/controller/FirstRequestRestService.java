@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import compiler.lelar.compiler.CompilerEntity;
 import compiler.lelar.compiler.CompilerForm;
 import exception.CompilerException;
+import logger.Logger;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -15,67 +16,108 @@ import runner.OberonCodeRunner;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 public class FirstRequestRestService extends BaseRestService
 {
+	private Gson gson = new GsonBuilder().create();
+
 	@Override
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
 	{
 		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
 		CompilerForm compilerForm = (CompilerForm) form;
 		fixRequestedData(compilerForm);
 
 		String code = compilerForm.getRequest()
-				.replace("\\plus", "+")
-				.replace("\\enter", "\n")
-				.replace("\\tab", "\t")
-				.replace("\\cell", "#")
-				.replace("\\percent", "%")
-				.replace("\\and", "&");
+				.replace("/plus", "+")
+				.replace("/enter", "\n")
+				.replace("/tab", "\t")
+				.replace("/cell", "#")
+				.replace("/percent", "%")
+				.replace("/and", "&")
+				.replace("/lcb", "{")
+				.replace("/rcb", "}")
+				.replace("/lbb", "[")
+				.replace("/rbb", "]")
+				.replace("/slash", "\\");
 		compilerForm.setRequest(code);
 		String vars = compilerForm.getVars()
-				.replace("\\plus", "+")
-				.replace("\\tab", "\t")
-				.replace("\\cell", "#")
-				.replace("\\percent", "%")
-				.replace("\\and", "&");
+				.replace("/plus", "+")
+				.replace("/tab", "\t")
+				.replace("/cell", "#")
+				.replace("/percent", "%")
+				.replace("/and", "&")
+				.replace("/lcb", "{")
+				.replace("/rcb", "}")
+				.replace("/lbb", "[")
+				.replace("/rbb", "]")
+				.replace("/slash", "\\");
 
 		CompilerEntity compilerEntity;
 		BaseCodeRunner codeRunner = null;
-		switch (compilerForm.getLanguage())
+		StringBuilder result = new StringBuilder();
+		String language = compilerForm.getLanguage();
+
+		boolean correctLanguage = true;
+
+		if (code.length() < 30)
 		{
-			case "Java":
-				codeRunner = new JavaCodeRunner();
-				break;
-			case "Oberon":
-				codeRunner = new OberonCodeRunner();
-				break;
-			case "C":
-				codeRunner = new CCodeRunner();
+			fillResponse(compilerForm, "Not correct input data", response);
+			return null;
 		}
 
-		GsonBuilder builder = new GsonBuilder();
-		Gson gson = builder.create();
+		switch (language)
+		{
+			case "Java":
+				if (code.contains("import ") || code.contains("class ") || code.contains("public "))
+				{
+					codeRunner = new JavaCodeRunner();
+				} else
+				{
+					correctLanguage = false;
+				}
+				break;
+			case "Oberon":
+				if (code.contains("MODULE ") || code.contains("BEGIN"))
+				{
+					codeRunner = new OberonCodeRunner();
+				} else
+				{
+					correctLanguage = false;
+				}
+				break;
+			case "C":
+				if (code.contains("#define ") || code.contains("#include "))
+				{
+					codeRunner = new CCodeRunner();
+				} else
+				{
+					correctLanguage = false;
+				}
+				break;
+			default:
+				correctLanguage = false;
+		}
+
+		if (!correctLanguage)
+		{
+			fillResponse(compilerForm, "Not correct language", response);
+			return null;
+		}
 
 		try
 		{
 			compilerEntity = codeRunner.start(code, vars, request);
 		} catch (CompilerException e)
 		{
-			compilerForm.setResponse(e.getMessage());
-
-			String jsonString = gson.toJson(compilerForm);
-
-			PrintWriter writer = response.getWriter();
-			writer.print(jsonString);
-			writer.flush();
-			response.setContentType("application/json");
-
+			Logger.fillLog(e);
+			fillResponse(compilerForm, e.getMessage(), response);
 			return null;
 		}
 
-		StringBuilder result = new StringBuilder();
 
 		if (compilerEntity == null)
 		{
@@ -83,20 +125,21 @@ public class FirstRequestRestService extends BaseRestService
 		} else
 		{
 			compilerEntity.getOut().forEach(
-					line -> result.append(line.replace("+", "\\plus")).append("\r\n")
+					line -> result.append(line.replace("+", "/plus")).append("\r\n")
 			);
 			compilerForm.setComplete(compilerEntity.isCompleted());
 		}
-		String resultString = result.toString();
-		compilerForm.setResponse(resultString);
 
-		String jsonString = gson.toJson(compilerForm);
+		fillResponse(compilerForm, result.toString(), response);
+		return null;
+	}
 
+	private void fillResponse(CompilerForm compilerForm, String result, HttpServletResponse response) throws IOException
+	{
+		compilerForm.setResponse(result);
 		PrintWriter writer = response.getWriter();
-		writer.print(jsonString);
+		writer.print(gson.toJson(compilerForm));
 		writer.flush();
 		response.setContentType("application/json");
-
-		return null;
 	}
 }

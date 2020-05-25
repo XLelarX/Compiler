@@ -5,7 +5,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import runner.BaseCodeRunner;
-import utils.ConsoleHelper;
+import utils.TerminalHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,10 +17,11 @@ public class SendVarsRestService extends BaseRestService
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
 	{
 		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
 		CompilerForm compilerForm = (CompilerForm) form;
 		fixRequestedData(compilerForm);
 
-		String vars = compilerForm.getVars().replace("\\plus", "+");
+		String vars = compilerForm.getVars().replace("/plus", "+");
 		String sessionId = request.getSession().getId();
 
 		Process sessionProcess = BaseCodeRunner.getProcesses().get(sessionId);
@@ -34,7 +35,7 @@ public class SendVarsRestService extends BaseRestService
 				String folderName = BaseCodeRunner.getFolderNames().remove(sessionId);
 				if (folderName != null)
 				{
-					ConsoleHelper.deleteTemporaryData(folderName);
+					TerminalHelper.deleteTemporaryData(folderName);
 				}
 			}
 		}

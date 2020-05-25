@@ -6,9 +6,13 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
-public class ConsoleHelper
+public class TerminalHelper
 {
-	private static final String PATH = "/Users/Lelar/Desktop/JavaProjects/execution/";
+	//public static final String PATH = "/Users/Lelar/Desktop/JavaProjects/execution/";
+	//private static final String VOC_PATH = "/Users/Lelar/Desktop/Oberon/voc/install/bin/voc";
+	public static final String PATH = "/classes/";
+	private static final String VOC_PATH = "/voc/voc";
+
 	private static final String TESTS_PATH = "/Users/Lelar/Desktop/JavaProjects/test/ExecutionTest/";
 	private static final String JAVA_FILE_FORMAT = ".java";
 	private static final String C_FILE_FORMAT = ".c";
@@ -17,6 +21,11 @@ public class ConsoleHelper
 	public static ProcessBuilder createDirectoryWith(String name)
 	{
 		return new ProcessBuilder("mkdir", PATH + name);
+	}
+
+	public static ProcessBuilder modifyFileWith(String name)
+	{
+		return new ProcessBuilder("chmod", "o+rwx", PATH + name);
 	}
 
 	public static boolean directoryIsExists(List<String> errorList, String folderName)
@@ -91,8 +100,7 @@ public class ConsoleHelper
 	public static ProcessBuilder compileOberon(String folderName, String fileName)
 	{
 		return new ProcessBuilder(
-				"/Users/Lelar/Desktop/Oberon/voc/install/bin/voc",
-				PATH + folderName + "/" + fileName + ".mod", "-m"
+				VOC_PATH, PATH + folderName + "/" + fileName + ".mod", "-m"
 		);
 	}
 
@@ -104,8 +112,7 @@ public class ConsoleHelper
 		String sourcePath = reader.readLine();
 
 		innerProcess = new ProcessBuilder(
-				"/Users/Lelar/Desktop/Oberon/voc/install/bin/voc",
-				TESTS_PATH + "oberon/" + fileName + ".mod", "-m"
+				VOC_PATH, TESTS_PATH + "oberon/" + fileName + ".mod", "-m"
 		).start();
 		new ProcessBuilder("cp", sourcePath + "/ExecutionTest", TESTS_PATH).start();
 

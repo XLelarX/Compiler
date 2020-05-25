@@ -3,7 +3,7 @@ package execution;
 import com.google.common.collect.ImmutableList;
 import org.junit.jupiter.api.*;
 import runner.BaseCodeRunner;
-import utils.ConsoleHelper;
+import utils.TerminalHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,14 +14,14 @@ public class JavaExecutionTest extends BaseExecutionTest
 	@BeforeAll
 	static void compile() throws InterruptedException
 	{
-		ConsoleHelper.compileTestJava(fileName);
+		TerminalHelper.compileTestJava(fileName);
 		Thread.sleep(1000);
 	}
 
 	@BeforeEach
 	void init() throws IOException
 	{
-		ProcessBuilder builder = ConsoleHelper.executeTestJava(fileName);
+		ProcessBuilder builder = TerminalHelper.executeTestJava(fileName);
 		builder.redirectErrorStream(true);
 		process = builder.start();
 		builder.redirectError().file();
@@ -49,7 +49,7 @@ public class JavaExecutionTest extends BaseExecutionTest
 
 		List<String> stdout = BaseCodeRunner.getOut().get(SESSION_ID);
 
-		ConsoleHelper.killProcess(process.pid());
+		TerminalHelper.killProcess(process.pid());
 
 		checkResult(stdout);
 	}
@@ -66,7 +66,7 @@ public class JavaExecutionTest extends BaseExecutionTest
 
 		List<String> stdout = BaseCodeRunner.getOut().get(SESSION_ID);
 
-		ConsoleHelper.killProcess(process.pid());
+		TerminalHelper.killProcess(process.pid());
 
 		checkResult(stdout);
 	}
@@ -83,7 +83,7 @@ public class JavaExecutionTest extends BaseExecutionTest
 
 		List<String> stdout = BaseCodeRunner.getOut().get(SESSION_ID);
 
-		ConsoleHelper.killProcess(process.pid());
+		TerminalHelper.killProcess(process.pid());
 
 		checkResultWithException(stdout);
 	}

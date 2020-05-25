@@ -2,7 +2,7 @@ package runner;
 
 import compiler.lelar.compiler.CompilerEntity;
 import exception.CompilerException;
-import utils.ConsoleHelper;
+import utils.TerminalHelper;
 import logger.Logger;
 
 import javax.servlet.http.HttpServletRequest;
@@ -71,13 +71,12 @@ public abstract class BaseCodeRunner
 				} catch (InterruptedException | IOException | CompilerException e)
 				{
 					Logger.fillLog(e);
-					atomicCompilerEntity.set(
-							new CompilerEntity(Collections.emptyList(), Collections.singletonList(e.getMessage()))
-					);
+					atomicCompilerEntity.set(new CompilerEntity(Collections.singletonList(e.getMessage())));
 				}
-			}).get(1000, TimeUnit.SECONDS);// attempt the task for two minutes
+			}).get(10000, TimeUnit.SECONDS);// attempt the task for two minutes
 		} catch (InterruptedException | TimeoutException | ExecutionException e)
 		{
+			Logger.fillLog(e);
 			throw new CompilerException(EXECUTION_ERRORS + '\n' + e);
 		} finally
 		{
@@ -188,10 +187,18 @@ public abstract class BaseCodeRunner
 		do
 		{
 			folderName = executionFileName + Math.round(Math.random() * 100);
-			process = ConsoleHelper.createDirectoryWith(folderName).start();
+			process = TerminalHelper.createDirectoryWith(folderName).start();
+			while (process.isAlive())
+			{
+			}
+			Process modifyProcess = TerminalHelper.modifyFileWith(folderName).start();
+			while (modifyProcess.isAlive())
+			{
+			}
+
 			mkdirErr = readFrom(process);
 		}
-		while (!mkdirErr.isEmpty() && ConsoleHelper.directoryIsExists(mkdirErr, folderName));
+		while (!mkdirErr.isEmpty() && TerminalHelper.directoryIsExists(mkdirErr, folderName));
 
 		return folderName;
 	}

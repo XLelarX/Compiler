@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import runner.BaseCodeRunner;
-import utils.ConsoleHelper;
+import utils.TerminalHelper;
 
 import java.io.IOException;
 import java.util.List;
@@ -19,14 +19,14 @@ public class CExecutionTest extends BaseExecutionTest
 	@BeforeAll
 	static void compile() throws IOException, InterruptedException
 	{
-		ConsoleHelper.compileTestC("ExecutionTest").start();
+		TerminalHelper.compileTestC("ExecutionTest").start();
 		Thread.sleep(1000);
 	}
 
 	@BeforeEach
 	void init() throws IOException
 	{
-		ProcessBuilder builder = ConsoleHelper.executeTestC("ExecutionTest");
+		ProcessBuilder builder = TerminalHelper.executeTestC("ExecutionTest");
 		builder.redirectErrorStream(true);
 		process = builder.start();
 	}
@@ -47,7 +47,7 @@ public class CExecutionTest extends BaseExecutionTest
 
 		List<String> stdout = BaseCodeRunner.getOut().get(SESSION_ID);
 
-		ConsoleHelper.killProcess(process.pid());
+		TerminalHelper.killProcess(process.pid());
 
 		checkResult(stdout);
 	}
@@ -64,7 +64,7 @@ public class CExecutionTest extends BaseExecutionTest
 
 		List<String> stdout = BaseCodeRunner.getOut().get(SESSION_ID);
 
-		ConsoleHelper.killProcess(process.pid());
+		TerminalHelper.killProcess(process.pid());
 
 		checkResult(stdout);
 	}

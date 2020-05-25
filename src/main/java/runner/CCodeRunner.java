@@ -2,7 +2,7 @@ package runner;
 
 import compiler.lelar.compiler.CompilerEntity;
 import exception.CompilerException;
-import utils.ConsoleHelper;
+import utils.TerminalHelper;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -40,17 +40,17 @@ public class CCodeRunner extends BaseCodeRunner
 		} else
 		{
 			errList.add(0, COMPILE_ERRORS);
-
-			outEntity = new CompilerEntity(Collections.emptyList(), errList, true);
+			TerminalHelper.deleteTemporaryData(folderName);
+			return new CompilerEntity(errList, true);
 		}
 
 		if (outEntity.isCompleted())
 		{
 			outEntity.getOut().add(0, "Compile time: " + compileTime / 1000 + " sec");
-			outEntity.getOut().add("Execution time: " + executionTime);
+			outEntity.getOut().add("Execution time: " + executionTime / 1000 + " sec");
 			processes.remove(sessionId);
 			out.remove(sessionId);
-			ConsoleHelper.deleteTemporaryData(folderName);
+			TerminalHelper.deleteTemporaryData(folderName);
 		} else
 		{
 			out.get(sessionId).add(0, "Compile time: " + compileTime / 1000 + " sec");
@@ -73,7 +73,7 @@ public class CCodeRunner extends BaseCodeRunner
 		executionFileName = "ExecutionFile";//extractExecutionFileName(code);
 		folderName = createFolder(executionFileName);
 
-		File newFile = ConsoleHelper.createCFile(folderName, executionFileName);
+		File newFile = TerminalHelper.createCFile(folderName, executionFileName);
 
 		if (!newFile.createNewFile())
 		{
@@ -96,7 +96,7 @@ public class CCodeRunner extends BaseCodeRunner
 	{
 		AtomicReference<Process> process = new AtomicReference<>();
 		ProcessBuilder processBuilder =
-				ConsoleHelper.executeC(folderName, executionFileName);
+				TerminalHelper.executeC(folderName, executionFileName);
 		processBuilder.redirectErrorStream(true);
 
 		ExecutorService executor = Executors.newCachedThreadPool();
@@ -151,7 +151,8 @@ public class CCodeRunner extends BaseCodeRunner
 	private List<String> compileCode() throws IOException
 	{
 		AtomicReference<Process> process = new AtomicReference<>();
-		ProcessBuilder processBuilder = ConsoleHelper.compileC(folderName, executionFileName);
+		ProcessBuilder processBuilder = TerminalHelper.compileC(folderName, executionFileName);
+		processBuilder.redirectErrorStream(true);
 		ExecutorService executor = Executors.newCachedThreadPool();
 
 		executor.submit(

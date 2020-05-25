@@ -7,7 +7,7 @@ import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
 import runner.BaseCodeRunner;
-import utils.ConsoleHelper;
+import utils.TerminalHelper;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +19,7 @@ public class GetResultRestService extends BaseRestService
 	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
 	{
 		request.setCharacterEncoding("UTF-8");
+		response.setCharacterEncoding("UTF-8");
 		CompilerForm compilerForm = (CompilerForm) form;
 		fixRequestedData(compilerForm);
 
@@ -29,7 +30,7 @@ public class GetResultRestService extends BaseRestService
 		{
 			StringBuilder result = new StringBuilder();
 			BaseCodeRunner.getOut().get(sessionId)
-					.forEach(line -> result.append(line.replace("+", "\\plus")).append("\r\n"));
+					.forEach(line -> result.append(line.replace("+", "/plus")).append("\r\n"));
 			result.append("Execution time: ").append((System.currentTimeMillis() - BaseCodeRunner.getExecutionTimes().get(sessionId)) / 1000).append("sec");
 
 			if (!sessionProcess.isAlive())
@@ -47,7 +48,7 @@ public class GetResultRestService extends BaseRestService
 				String folderName = BaseCodeRunner.getFolderNames().remove(sessionId);
 				if (folderName != null)
 				{
-					ConsoleHelper.deleteTemporaryData(folderName);
+					TerminalHelper.deleteTemporaryData(folderName);
 				}
 
 				BaseCodeRunner.getExecutionTimes().remove(sessionId);
