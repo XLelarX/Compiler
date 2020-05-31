@@ -1,17 +1,19 @@
 package execution;
 
 import com.google.common.collect.ImmutableList;
+import data.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import runner.BaseCodeRunner;
-import utils.TerminalHelper;
+import util.TerminalHelper;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
-public class CExecutionTest extends BaseExecutionTest
+class CExecutionTest extends BaseExecutionTest
 {
 	private static final String SESSION_ID = "testSessionId";
 	private static Process process;
@@ -34,7 +36,8 @@ public class CExecutionTest extends BaseExecutionTest
 	@Test
 	void test2StepExecution() throws IOException
 	{
-		BaseCodeRunner.getProcesses().put(SESSION_ID, process);
+		Map<String, UserData> userDataMap = BaseCodeRunner.getUserDataMap();
+		userDataMap.put(SESSION_ID, new UserData(process));
 
 		BaseCodeRunner.writeInProcess(
 				SESSION_ID, ImmutableList.<String>builder().add("1").build()
@@ -45,7 +48,7 @@ public class CExecutionTest extends BaseExecutionTest
 				SESSION_ID, ImmutableList.<String>builder().add("2").build()
 		);
 
-		List<String> stdout = BaseCodeRunner.getOut().get(SESSION_ID);
+		List<String> stdout = userDataMap.get(SESSION_ID).getOut();
 
 		TerminalHelper.killProcess(process.pid());
 
@@ -55,14 +58,15 @@ public class CExecutionTest extends BaseExecutionTest
 	@Test
 	void testExecution() throws IOException
 	{
-		BaseCodeRunner.getProcesses().put(SESSION_ID, process);
+		Map<String, UserData> userDataMap = BaseCodeRunner.getUserDataMap();
+		userDataMap.put(SESSION_ID, new UserData(process));
 
 		BaseCodeRunner.writeInProcess(
 				SESSION_ID, ImmutableList.<String>builder().add("1", "2").build()
 		);
 		BaseCodeRunner.readFrom(SESSION_ID);
 
-		List<String> stdout = BaseCodeRunner.getOut().get(SESSION_ID);
+		List<String> stdout = userDataMap.get(SESSION_ID).getOut();
 
 		TerminalHelper.killProcess(process.pid());
 

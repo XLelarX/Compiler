@@ -1,4 +1,4 @@
-package utils;
+package util;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -8,34 +8,26 @@ import java.util.List;
 
 public class TerminalHelper
 {
-	//public static final String PATH = "/Users/Lelar/Desktop/JavaProjects/execution/";
-	//private static final String VOC_PATH = "/Users/Lelar/Desktop/Oberon/voc/install/bin/voc";
-	public static final String PATH = "/classes/";
-	private static final String VOC_PATH = "/voc/voc";
-
 	private static final String TESTS_PATH = "/Users/Lelar/Desktop/JavaProjects/test/ExecutionTest/";
-	private static final String JAVA_FILE_FORMAT = ".java";
-	private static final String C_FILE_FORMAT = ".c";
-	private static final String OBERON_FILE_FORMAT = ".mod";
 
 	public static ProcessBuilder createDirectoryWith(String name)
 	{
-		return new ProcessBuilder("mkdir", PATH + name);
+		return new ProcessBuilder("mkdir", Constants.LocalRun.PATH + name);
 	}
 
 	public static ProcessBuilder modifyFileWith(String name)
 	{
-		return new ProcessBuilder("chmod", "o+rwx", PATH + name);
+		return new ProcessBuilder("chmod", "o+rwx", Constants.LocalRun.PATH + name);
 	}
 
 	public static boolean directoryIsExists(List<String> errorList, String folderName)
 	{
-		return errorList.get(0).equals("mkdir: " + PATH + folderName + ": File exists");
+		return errorList.get(0).equals("mkdir: " + Constants.LocalRun.PATH + folderName + ": File exists");
 	}
 
 	public static void deleteTemporaryData(String folderName) throws IOException
 	{
-		new ProcessBuilder("rm", "-R", PATH + folderName).start();
+		new ProcessBuilder("rm", "-R", Constants.LocalRun.PATH + folderName).start();
 	}
 
 	public static void killProcess(long pid) throws IOException
@@ -45,17 +37,17 @@ public class TerminalHelper
 
 	public static ProcessBuilder executeJava(String folderName, String fileName)
 	{
-		return new ProcessBuilder("java", "-cp", PATH + folderName + "/", fileName);
+		return new ProcessBuilder("java", "-cp", Constants.LocalRun.PATH + folderName + "/", fileName);
 	}
 
 	public static ProcessBuilder executeC(String folderName, String fileName)
 	{
-		return new ProcessBuilder(PATH + folderName + "/" + fileName);
+		return new ProcessBuilder(Constants.LocalRun.PATH + folderName + "/" + fileName);
 	}
 
 	public static ProcessBuilder executeOberon(String folderName, String fileName)
 	{
-		return new ProcessBuilder(PATH + folderName + "/" + fileName);
+		return new ProcessBuilder(Constants.LocalRun.PATH + folderName + "/" + fileName);
 	}
 
 	public static ProcessBuilder executeTestJava(String fileName)
@@ -75,32 +67,32 @@ public class TerminalHelper
 
 	public static ProcessBuilder compileJava(String folderName, String fileName)
 	{
-		return new ProcessBuilder("javac", PATH + folderName + "/" + fileName + JAVA_FILE_FORMAT);
+		return new ProcessBuilder("javac", Constants.LocalRun.PATH + folderName + "/" + fileName + Constants.FileFormat.JAVA_FILE_FORMAT);
 	}
 
 	public static ProcessBuilder compileTestJava(String fileName)
 	{
-		return new ProcessBuilder("javac", TESTS_PATH + "java/" + fileName + JAVA_FILE_FORMAT);
+		return new ProcessBuilder("javac", TESTS_PATH + "java/" + fileName + Constants.FileFormat.JAVA_FILE_FORMAT);
 	}
 
 	public static ProcessBuilder compileC(String folderName, String fileName)
 	{
 		return new ProcessBuilder(
-				"gcc", PATH + folderName + "/" + fileName + C_FILE_FORMAT, "-o", PATH + folderName + "/" + fileName
+				"gcc", Constants.LocalRun.PATH + folderName + "/" + fileName + Constants.FileFormat.C_FILE_FORMAT, "-o", Constants.LocalRun.PATH + folderName + "/" + fileName
 		);
 	}
 
 	public static ProcessBuilder compileTestC(String fileName)
 	{
 		return new ProcessBuilder(
-				"gcc", TESTS_PATH + "c/" + fileName + C_FILE_FORMAT, "-o", TESTS_PATH + "c/" + fileName
+				"gcc", TESTS_PATH + "c/" + fileName + Constants.FileFormat.C_FILE_FORMAT, "-o", TESTS_PATH + "c/" + fileName
 		);
 	}
 
 	public static ProcessBuilder compileOberon(String folderName, String fileName)
 	{
 		return new ProcessBuilder(
-				VOC_PATH, PATH + folderName + "/" + fileName + ".mod", "-m"
+				Constants.LocalRun.VOC_PATH, Constants.LocalRun.PATH + folderName + "/" + fileName + ".mod", "-m"
 		);
 	}
 
@@ -112,7 +104,7 @@ public class TerminalHelper
 		String sourcePath = reader.readLine();
 
 		innerProcess = new ProcessBuilder(
-				VOC_PATH, TESTS_PATH + "oberon/" + fileName + ".mod", "-m"
+				Constants.LocalRun.VOC_PATH, TESTS_PATH + "oberon/" + fileName + ".mod", "-m"
 		).start();
 		new ProcessBuilder("cp", sourcePath + "/ExecutionTest", TESTS_PATH).start();
 
@@ -121,16 +113,16 @@ public class TerminalHelper
 
 	public static File createJavaFile(String folderName, String fileName)
 	{
-		return new File(PATH + folderName + "/" + fileName + JAVA_FILE_FORMAT);
+		return new File(Constants.LocalRun.PATH + folderName + "/" + fileName + Constants.FileFormat.JAVA_FILE_FORMAT);
 	}
 
 	public static File createCFile(String folderName, String fileName)
 	{
-		return new File(PATH + folderName + "/" + fileName + C_FILE_FORMAT);
+		return new File(Constants.LocalRun.PATH + folderName + "/" + fileName + Constants.FileFormat.C_FILE_FORMAT);
 	}
 
 	public static File createOberonFile(String folderName, String fileName)
 	{
-		return new File(PATH + folderName + "/" + fileName + OBERON_FILE_FORMAT);
+		return new File(Constants.LocalRun.PATH + folderName + "/" + fileName + Constants.FileFormat.OBERON_FILE_FORMAT);
 	}
 }

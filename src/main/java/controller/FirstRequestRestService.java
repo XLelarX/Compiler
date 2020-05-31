@@ -1,9 +1,7 @@
 package controller;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import compiler.lelar.compiler.CompilerEntity;
-import compiler.lelar.compiler.CompilerForm;
+import data.CompilerEntity;
+import form.CompilerForm;
 import exception.CompilerException;
 import logger.Logger;
 import org.apache.struts.action.ActionForm;
@@ -13,55 +11,27 @@ import runner.BaseCodeRunner;
 import runner.CCodeRunner;
 import runner.JavaCodeRunner;
 import runner.OberonCodeRunner;
+import util.Constants;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 public class FirstRequestRestService extends BaseRestService
 {
-	private Gson gson = new GsonBuilder().create();
-
 	@Override
-	public ActionForward execute(ActionMapping mapping, ActionForm form, HttpServletRequest request, HttpServletResponse response) throws Exception
+	public ActionForward execute(
+			ActionMapping mapping, ActionForm form,
+			HttpServletRequest request, HttpServletResponse response
+	) throws IOException
 	{
-		request.setCharacterEncoding("UTF-8");
-		response.setCharacterEncoding("UTF-8");
+		request.setCharacterEncoding(Constants.CHAR_ENCODING);
+
 		CompilerForm compilerForm = (CompilerForm) form;
-		fixRequestedData(compilerForm);
-
-		String code = compilerForm.getRequest()
-				.replace("/plus", "+")
-				.replace("/enter", "\n")
-				.replace("/tab", "\t")
-				.replace("/cell", "#")
-				.replace("/percent", "%")
-				.replace("/and", "&")
-				.replace("/lcb", "{")
-				.replace("/rcb", "}")
-				.replace("/lbb", "[")
-				.replace("/rbb", "]")
-				.replace("/slash", "\\");
+		String code = fixRequest(compilerForm.getRequest());
+		String vars = fixRequest(compilerForm.getVars());
 		compilerForm.setRequest(code);
-		String vars = compilerForm.getVars()
-				.replace("/plus", "+")
-				.replace("/tab", "\t")
-				.replace("/cell", "#")
-				.replace("/percent", "%")
-				.replace("/and", "&")
-				.replace("/lcb", "{")
-				.replace("/rcb", "}")
-				.replace("/lbb", "[")
-				.replace("/rbb", "]")
-				.replace("/slash", "\\");
-
-		CompilerEntity compilerEntity;
-		BaseCodeRunner codeRunner = null;
-		StringBuilder result = new StringBuilder();
-		String language = compilerForm.getLanguage();
-
-		boolean correctLanguage = true;
+		compilerForm.setVars(vars);
 
 		if (code.length() < 30)
 		{
@@ -69,48 +39,18 @@ public class FirstRequestRestService extends BaseRestService
 			return null;
 		}
 
-		switch (language)
-		{
-			case "Java":
-				if (code.contains("import ") || code.contains("class ") || code.contains("public "))
-				{
-					codeRunner = new JavaCodeRunner();
-				} else
-				{
-					correctLanguage = false;
-				}
-				break;
-			case "Oberon":
-				if (code.contains("MODULE ") || code.contains("BEGIN"))
-				{
-					codeRunner = new OberonCodeRunner();
-				} else
-				{
-					correctLanguage = false;
-				}
-				break;
-			case "C":
-				if (code.contains("#define ") || code.contains("#include "))
-				{
-					codeRunner = new CCodeRunner();
-				} else
-				{
-					correctLanguage = false;
-				}
-				break;
-			default:
-				correctLanguage = false;
-		}
+		BaseCodeRunner codeRunner = chooseRunner(compilerForm.getLanguage(), code);
 
-		if (!correctLanguage)
+		if (codeRunner == null)
 		{
 			fillResponse(compilerForm, "Not correct language", response);
 			return null;
 		}
 
+		CompilerEntity compilerEntity;
 		try
 		{
-			compilerEntity = codeRunner.start(code, vars, request);
+			compilerEntity = codeRunner.start(code, vars, request.getSession().getId());
 		} catch (CompilerException e)
 		{
 			Logger.fillLog(e);
@@ -118,28 +58,47 @@ public class FirstRequestRestService extends BaseRestService
 			return null;
 		}
 
+		StringBuilder result = new StringBuilder();
 
-		if (compilerEntity == null)
-		{
-			result.append("Ожидаются данные");
-		} else
-		{
-			compilerEntity.getOut().forEach(
-					line -> result.append(line.replace("+", "/plus")).append("\r\n")
-			);
-			compilerForm.setComplete(compilerEntity.isCompleted());
-		}
-
+		compilerEntity.getOut().forEach(line -> result.append(line).append("\r\n"));
+		compilerForm.setComplete(compilerEntity.isCompleted());
 		fillResponse(compilerForm, result.toString(), response);
+
 		return null;
 	}
 
-	private void fillResponse(CompilerForm compilerForm, String result, HttpServletResponse response) throws IOException
+	/**
+	 * Выбор runner-а
+	 *
+	 * @param language - Язык программирования
+	 * @param code     - Код программы
+	 */
+	private BaseCodeRunner chooseRunner(String language, String code)
 	{
-		compilerForm.setResponse(result);
-		PrintWriter writer = response.getWriter();
-		writer.print(gson.toJson(compilerForm));
-		writer.flush();
-		response.setContentType("application/json");
+		BaseCodeRunner codeRunner = null;
+
+		switch (language)
+		{
+			case "Java":
+				if (code.contains("import ") || code.contains("class ") || code.contains("public "))
+				{
+					codeRunner = new JavaCodeRunner();
+				}
+				break;
+			case "Oberon":
+				if (code.contains("MODULE ") || code.contains("BEGIN"))
+				{
+					codeRunner = new OberonCodeRunner();
+				}
+				break;
+			case "C":
+				if (code.contains("#define ") || code.contains("#include "))
+				{
+					codeRunner = new CCodeRunner();
+				}
+				break;
+		}
+
+		return codeRunner;
 	}
 }

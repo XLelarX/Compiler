@@ -1,15 +1,17 @@
 package execution;
 
 import com.google.common.collect.ImmutableList;
+import data.UserData;
 import org.junit.jupiter.api.*;
 import runner.BaseCodeRunner;
-import utils.TerminalHelper;
+import util.TerminalHelper;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
-public class JavaExecutionTest extends BaseExecutionTest
+class JavaExecutionTest extends BaseExecutionTest
 {
 	@BeforeAll
 	static void compile() throws InterruptedException
@@ -36,7 +38,8 @@ public class JavaExecutionTest extends BaseExecutionTest
 	@Test
 	void test2StepExecution() throws IOException
 	{
-		BaseCodeRunner.getProcesses().put(SESSION_ID, process);
+		Map<String, UserData> userDataMap = BaseCodeRunner.getUserDataMap();
+		userDataMap.put(SESSION_ID, new UserData(process));
 
 		BaseCodeRunner.writeInProcess(
 				SESSION_ID, ImmutableList.<String>builder().add("1").build()
@@ -47,7 +50,7 @@ public class JavaExecutionTest extends BaseExecutionTest
 				SESSION_ID, ImmutableList.<String>builder().add("2").build()
 		);
 
-		List<String> stdout = BaseCodeRunner.getOut().get(SESSION_ID);
+		List<String> stdout = userDataMap.get(SESSION_ID).getOut();
 
 		TerminalHelper.killProcess(process.pid());
 
@@ -57,14 +60,15 @@ public class JavaExecutionTest extends BaseExecutionTest
 	@Test
 	void testExecution() throws IOException
 	{
-		BaseCodeRunner.getProcesses().put(SESSION_ID, process);
+		Map<String, UserData> userDataMap = BaseCodeRunner.getUserDataMap();
+		userDataMap.put(SESSION_ID, new UserData(process));
 
 		BaseCodeRunner.writeInProcess(
 				SESSION_ID, ImmutableList.<String>builder().add("1", "2").build()
 		);
 		BaseCodeRunner.readFrom(SESSION_ID);
 
-		List<String> stdout = BaseCodeRunner.getOut().get(SESSION_ID);
+		List<String> stdout = userDataMap.get(SESSION_ID).getOut();
 
 		TerminalHelper.killProcess(process.pid());
 
@@ -74,14 +78,15 @@ public class JavaExecutionTest extends BaseExecutionTest
 	@Test
 	void testExecutionWithError() throws IOException
 	{
-		BaseCodeRunner.getProcesses().put(SESSION_ID, process);
+		Map<String, UserData> userDataMap = BaseCodeRunner.getUserDataMap();
+		userDataMap.put(SESSION_ID, new UserData(process));
 
 		BaseCodeRunner.writeInProcess(
 				SESSION_ID, ImmutableList.<String>builder().add("1", "afsaf").build()
 		);
 		BaseCodeRunner.readFrom(SESSION_ID);
 
-		List<String> stdout = BaseCodeRunner.getOut().get(SESSION_ID);
+		List<String> stdout = userDataMap.get(SESSION_ID).getOut();
 
 		TerminalHelper.killProcess(process.pid());
 

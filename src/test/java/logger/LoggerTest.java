@@ -2,8 +2,8 @@ package logger;
 
 import exception.CompilerException;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import util.Constants;
 
 import java.io.*;
 
@@ -13,12 +13,6 @@ class LoggerTest
 {
 	private static final String FIRST_EXCEPTION_MESSAGE = "first test exception";
 	private static final String SECOND_EXCEPTION_MESSAGE = "second test exception";
-
-	@BeforeEach
-	void beforeTest()
-	{
-		initLog();
-	}
 
 	@Test
 	void testFillLogWithNullException()
@@ -45,11 +39,15 @@ class LoggerTest
 			fillLog(e);
 		}
 
+		checkResult();
+	}
 
-		BufferedReader fileReader = new BufferedReader(new FileReader(getLogFilePath()));
-		String line;
+	private void checkResult() throws IOException
+	{
+		BufferedReader fileReader = new BufferedReader(new FileReader(Constants.LocalRun.LOG_FILE_PATH));
 		boolean firstExists = false;
 		boolean secondExists = false;
+		String line;
 
 		while ((!firstExists || !secondExists) && ((line = fileReader.readLine()) != null))
 		{
@@ -78,6 +76,6 @@ class LoggerTest
 			fillLog(e);
 		}
 
-		Assertions.assertTrue(new File(getLogFilePath()).length() != 0);
+		Assertions.assertTrue(new File(Constants.LocalRun.LOG_FILE_PATH).length() != 0);
 	}
 }

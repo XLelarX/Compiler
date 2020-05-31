@@ -1,14 +1,36 @@
-package compiler.lelar.compiler;
+package form;
 
 import org.apache.struts.action.ActionForm;
 
+/**
+ * Класс-отображение для страницы
+ */
 public class CompilerForm extends ActionForm
 {
+	/**
+	 * Поле с кодом
+	 */
 	private String request;
+
+	/**
+	 * Поле с ответом
+	 */
 	private String response;
+
+	/**
+	 * Поле с передаваемыми параметрами
+	 */
 	private String vars;
-	private boolean complete;
+
+	/**
+	 * Поле со списком языков
+	 */
 	private String language;
+
+	/**
+	 * Невидимое поле, обозначающее конец выполнения программы
+	 */
+	private boolean complete;
 
 	public String getRequest()
 	{

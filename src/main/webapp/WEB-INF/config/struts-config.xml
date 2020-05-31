@@ -4,15 +4,9 @@
 
 <struts-config>
     <form-beans>
-        <form-bean name="CompilerForm" type="compiler.lelar.compiler.CompilerForm"/>
+        <form-bean name="CompilerForm" type="form.CompilerForm"/>
     </form-beans>
     <action-mappings>
-        <action path="/compiler"
-                type="compiler.lelar.compiler.CompilerAction"
-                name="CompilerForm"
-                validate="false">
-            <forward name="Start" path="/WEB-INF/jsp/compiler.jsp"/>
-        </action>
         <action path="/compileAjax"
                 type="controller.FirstRequestRestService"
                 name="CompilerForm"

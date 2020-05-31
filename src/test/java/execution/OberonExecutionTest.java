@@ -1,17 +1,19 @@
 package execution;
 
 import com.google.common.collect.ImmutableList;
+import data.UserData;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import runner.BaseCodeRunner;
-import utils.TerminalHelper;
+import util.TerminalHelper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.Map;
 
 public class OberonExecutionTest
 {
@@ -45,11 +47,12 @@ public class OberonExecutionTest
 	@Test
 	void test2StepExecution() throws IOException
 	{
-		BaseCodeRunner.getProcesses().put(SESSION_ID, process);
+		Map<String, UserData> userDataMap = BaseCodeRunner.getUserDataMap();
+		userDataMap.put(SESSION_ID, new UserData(process));
 
 		BaseCodeRunner.readFrom(SESSION_ID);
 
-		List<String> stdout = BaseCodeRunner.getOut().get(SESSION_ID);
+		List<String> stdout = userDataMap.get(SESSION_ID).getOut();
 
 		TerminalHelper.killProcess(process.pid());
 

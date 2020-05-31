@@ -1,11 +1,10 @@
 package runner;
 
-import compiler.lelar.compiler.CompilerEntity;
+import data.CompilerEntity;
 import exception.CompilerException;
-import utils.TerminalHelper;
+import util.TerminalHelper;
 
 import java.io.*;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicReference;
@@ -16,57 +15,13 @@ import java.util.concurrent.atomic.AtomicReference;
 public class JavaCodeRunner extends BaseCodeRunner
 {
 	@Override
-	CompilerEntity run(String code, String vars, String sessionId)
-			throws IOException, CompilerException
+	boolean compileIsComplete(List<String> compileErrorList)
 	{
-		prepareExecutionFile(code);
-
-		long compileTime = System.currentTimeMillis();
-		List<String> errList = compileCode();
-		compileTime = System.currentTimeMillis() - compileTime;
-
-		CompilerEntity outEntity;
-		long executionTime = 0;
-		if (errList.isEmpty())
-		{
-			executionTime = System.currentTimeMillis();
-			outEntity = executeCode(vars, sessionId);
-			if (outEntity.isCompleted())
-			{
-				executionTime = System.currentTimeMillis() - executionTime;
-			}
-		} else
-		{
-			errList.add(0, COMPILE_ERRORS);
-			TerminalHelper.deleteTemporaryData(folderName);
-			return new CompilerEntity(errList, true);
-		}
-
-		if (outEntity.isCompleted())
-		{
-			outEntity.getOut().add(0, "Compile time: " + compileTime / 1000 + " sec");
-			outEntity.getOut().add("Execution time: " + executionTime / 1000 + " sec");
-			processes.remove(sessionId);
-			out.remove(sessionId);
-			TerminalHelper.deleteTemporaryData(folderName);
-		} else
-		{
-			out.get(sessionId).add(0, "Compile time: " + compileTime / 1000 + " sec");
-			executionTimes.put(sessionId, executionTime);
-			folderNames.put(sessionId, folderName);
-		}
-
-		return outEntity;
+		return compileErrorList.isEmpty();
 	}
 
-	/**
-	 * Подготовка исполняемого файла
-	 *
-	 * @param code - Код программы
-	 * @throws IOException
-	 * @throws CompilerException - Ошибкаы создания файла
-	 */
-	private void prepareExecutionFile(String code) throws IOException, CompilerException
+	@Override
+	void preProcessing(String code) throws IOException, CompilerException
 	{
 		executionFileName = extractExecutionFileName(code);
 		folderName = createFolder(executionFileName);
@@ -83,92 +38,33 @@ public class JavaCodeRunner extends BaseCodeRunner
 		fileOutputStream.close();
 	}
 
-	/**
-	 * Выполнение скомпилировааной программы
-	 *
-	 * @param vars - Переменные, передаваемые в программу, во время ее выполнения
-	 * @return - Результат выполнения программы
-	 * @throws IOException
-	 */
-	private CompilerEntity executeCode(String vars, String sessionId) throws IOException
+	@Override
+	CompilerEntity executeCode(String vars, String sessionId) throws IOException
 	{
-		AtomicReference<Process> process = new AtomicReference<>();
-		ProcessBuilder processBuilder =
-				TerminalHelper.executeJava(folderName, executionFileName);
-		processBuilder.redirectErrorStream(true);
-
-		ExecutorService executor = Executors.newCachedThreadPool();
-		executor.submit(
-				new FutureTask(
-						(Callable<Integer>) () -> {
-							process.set(processBuilder.start());
-							return process.get().waitFor();
-						})
+		CompilerEntity compilerEntity = executeWithWaiting(
+				vars, sessionId, TerminalHelper.executeJava(folderName, executionFileName)
 		);
-		executor.shutdown();
 
-		long time = System.currentTimeMillis();
-		while (!executor.isTerminated() && System.currentTimeMillis() - time < EXECUTION_TIME)
-		{
-		}
-
-		if (!vars.equals("") && !executor.isTerminated())
-		{
-			writeInProcess(process.get(), Collections.singletonList(vars));
-
-			while (!executor.isTerminated() && System.currentTimeMillis() - time < EXECUTION_TIME)
-			{
-			}
-		}
-
-		boolean complete = true;
-
-		if (!executor.isTerminated())
-		{
-			processes.put(sessionId, process.get());
-			complete = false;
-		}
-
-		List<String> output;
-		if (complete)
-		{
-			output = readFrom(process.get());
-		} else
-		{
-			output = readFrom(sessionId);
-		}
-
+		List<String> output = compilerEntity.getOut();
 		if (output.contains("NOTE: Picked up JDK_JAVA_OPTIONS:  " +
 				"--add-opens=java.base/java.lang=ALL-UNNAMED " +
 				"--add-opens=java.base/java.io=ALL-UNNAMED " +
-				"--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED"))
+				"--add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED")
+		)
 		{
 			output.remove(0);
 		}
 
-		return new CompilerEntity(output, Collections.emptyList(), complete);
+		return compilerEntity;
 	}
 
-	/**
-	 * Компиляция кода
-	 *
-	 * @return - Ошибки компиляции
-	 */
-	private List<String> compileCode() throws IOException
+	@Override
+	List<String> compileCode() throws IOException
 	{
 		AtomicReference<Process> process = new AtomicReference<>();
-		ProcessBuilder processBuilder = TerminalHelper.compileJava(folderName, executionFileName);
-		processBuilder.redirectErrorStream(true);
-		ExecutorService executor = Executors.newCachedThreadPool();
-
-		executor.submit(
-				new FutureTask(
-						(Callable<Integer>) () -> {
-							process.set(processBuilder.start());
-							return process.get().waitFor();
-						})
+		ExecutorService executor = startProcess(
+				TerminalHelper.compileJava(folderName, executionFileName), process
 		);
-		executor.shutdown();
 		while (!executor.isTerminated())
 		{
 		}

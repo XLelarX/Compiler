@@ -1,5 +1,7 @@
 package logger;
 
+import util.Constants;
+
 import java.io.*;
 import java.util.Objects;
 
@@ -8,18 +10,12 @@ import java.util.Objects;
  */
 public class Logger
 {
-	private final static String LOG_FILE_PATH = "/log/log";
-	//private final static String LOG_FILE_PATH = "/Users/Lelar/Desktop/JavaProjects/log/log";
+	private static final File LOG_FILE = new File(Constants.LocalRun.LOG_FILE_PATH);
 	private static PrintStream log;
-
-//	static
-//	{
-//		initLog();
-//	}
 
 	public Logger()
 	{
-		throw new IllegalStateException("don't create instance of this class");
+		throw new IllegalStateException("Don't create instance of this class");
 	}
 
 	/**
@@ -29,51 +25,39 @@ public class Logger
 	 */
 	public static void fillLog(Exception exception)
 	{
-		Objects.requireNonNull(exception, "exception can't be null!!!");
+		Objects.requireNonNull(exception, "Exception can't be null!!!");
 
-		if (new File(LOG_FILE_PATH).exists())
+		if (LOG_FILE.exists() && log != null)
 		{
 			exception.printStackTrace(log);
 			log.flush();
 		} else
 		{
-			initLog();
+			createLogFile();
 			fillLog(exception);
-			//exception.printStackTrace();
 		}
 	}
 
 	/**
 	 * Инициализация log-файла
 	 */
-	static void initLog()
+	private static void createLogFile()
 	{
-		if (log != null)
-		{
-			log.close();
-		}
-
 		try
 		{
-			log = new PrintStream(LOG_FILE_PATH);
+			log = new PrintStream(LOG_FILE);
 		} catch (FileNotFoundException e)
 		{
 			try
 			{
-				if (new File(LOG_FILE_PATH).createNewFile())
+				if (LOG_FILE.createNewFile())
 				{
-					log = new PrintStream(LOG_FILE_PATH);
+					log = new PrintStream(LOG_FILE);
 				}
 			} catch (IOException exception)
 			{
 				exception.printStackTrace();
-				//logFileExists = false;
 			}
 		}
-	}
-
-	static String getLogFilePath()
-	{
-		return LOG_FILE_PATH;
 	}
 }
