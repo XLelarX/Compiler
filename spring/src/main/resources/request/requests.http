@@ -1,0 +1,30 @@
+POST http://localhost:8080/auth/login
+Content-Type: application/json
+Session-Id: sessionId
+
+{
+  "username": "lelar",
+  "password": "qwerty12345"
+}
+
+###
+
+POST http://localhost:8080/tournament/getBetween
+Content-Type: application/json
+
+{
+  "startBeginDate": "2020-01-01T00:00:00",
+  "startEndDate": "2021-11-01T00:00:00"
+}
+
+###
+
+POST http://localhost:8080/pictures/get
+Content-Type: application/json
+
+{
+  "startBeginDate": "2020-01-01T00:00:00",
+  "startEndDate": "2021-11-01T00:00:00"
+}
+
+###

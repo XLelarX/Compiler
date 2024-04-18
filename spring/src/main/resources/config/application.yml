@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    name: cloud
+  h2:
+    console:
+      enabled: true
+
+logging:
+  level:
+    org:
+      springframework:
+        jdbc:
+          core:
+            JdbcTemplate: DEBUG

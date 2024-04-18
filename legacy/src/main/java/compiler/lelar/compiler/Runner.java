@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.concurrent.*;
 
 class Runner {
-//    private final static String PATH = "/classes/";//TODO реализовать создание папки с последующим ее удалдением
+//    private final templates String PATH = "/classes/";//TODO реализовать создание папки с последующим ее удалдением
     private final static String PATH = "/Users/Lelar/Desktop/JavaProjects/compiler/";
     private final static String EXECUTION_ERRORS = "Execution errors: ";
     private final static String COMPILE_ERRORS = "Compile errors: ";
