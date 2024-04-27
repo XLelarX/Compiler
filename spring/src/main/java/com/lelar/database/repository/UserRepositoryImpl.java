@@ -10,11 +10,13 @@ import org.springframework.stereotype.Repository;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static com.lelar.database.entity.IdentifierEntity.Names.ID;
+
 @Repository
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
     private final static String FIND_BY_ID_REQUEST = ("select * from %s where %s = ?")
-        .formatted( Names.TABLE_NAME, Names.LOGIN_ID);
+        .formatted(Names.TABLE_NAME, Names.LOGIN_ID);
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -28,10 +30,14 @@ public class UserRepositoryImpl implements UserRepository {
             return null;
         }
 
-        return new UserEntity()
-            .setId(resultSet.getLong(Names.ID))
+        UserEntity userEntity = new UserEntity()
             .setFirstName(resultSet.getString(Names.FIRST_NAME))
             .setSecondName(resultSet.getString(Names.SECOND_NAME))
             .setPatronymic(resultSet.getString(Names.PATRONYMIC));
+
+        userEntity.setId(resultSet.getLong(ID));
+
+        return userEntity;
     }
+
 }

@@ -1,6 +1,6 @@
-package com.lelar.collector;
+package com.lelar.service.get;
 
-import com.lelar.collector.api.Collector;
+import com.lelar.service.get.api.GetService;
 import com.lelar.database.entity.LoginEntity;
 import com.lelar.database.entity.PermissionEntity;
 import com.lelar.database.entity.SquadEntity;
@@ -26,19 +26,20 @@ import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
-public class LoginResponseCollector implements Collector<LoginRequest, LoginResponse> {
+public class LoginResponseGetService implements GetService<LoginRequest, LoginResponse> {
     private final LoginRepository loginRepository;
     private final UserRepository userRepository;
     private final PermissionRepository permissionRepository;
     private final SquadRepository squadRepository;
 
     @Override
-    public LoginResponse collect(LoginRequest request) throws ApplicationException {
+    public LoginResponse get(LoginRequest request) throws ApplicationException {
         LoginEntity loginEntity = loginRepository.findByLogin(request.getUsername());
 
         Optional<String> dbPassword = Optional.ofNullable(loginEntity).map(LoginEntity::getPassword).filter(it -> it.equals(request.getPassword()));
 
         if (dbPassword.isEmpty()) {
+            //TODO add exception resolver in filter
             throw new WrongPasswordException();
         }
 

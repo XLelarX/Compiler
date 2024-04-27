@@ -1,13 +1,12 @@
 package com.lelar.controller;
 
-import com.lelar.collector.api.Collector;
+import com.lelar.service.get.api.GetService;
 import com.lelar.dto.PictureRequest;
-import com.lelar.dto.tournament.TournamentRequest;
-import com.lelar.dto.tournament.TournamentResponse;
 import com.lelar.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,16 +18,17 @@ import java.io.InputStream;
 @RequiredArgsConstructor
 @RequestMapping("/pictures")
 public class PictureController {
-    private final Collector<TournamentRequest, TournamentResponse> collector;
+    private final GetService<PictureRequest, InputStream> getService;
 
-    @GetMapping(
-        value = "/get",
+    @PostMapping(
+        value = "/getByPath",
+        consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.IMAGE_JPEG_VALUE
     )
     @ResponseBody
-    public byte[] getTournaments() throws ApplicationException, IOException {
-        InputStream in = getClass()
-            .getResourceAsStream("/pictures/image.jpg");
+    public byte[] getPicture(@RequestBody PictureRequest request) throws ApplicationException, IOException {
+        InputStream in = getService.get(request);
+
         return in.readAllBytes();
     }
 }

@@ -1,12 +1,14 @@
 package com.lelar.controller;
 
-import com.lelar.collector.api.Collector;
+import com.lelar.dto.login.RegisterRequest;
+import com.lelar.service.get.api.GetService;
 import com.lelar.dto.BaseResponse;
 import com.lelar.dto.login.LoginRequest;
 import com.lelar.dto.login.LoginResponse;
 import com.lelar.exception.ApplicationException;
 import com.lelar.mapper.SessionDataMapper;
 import com.lelar.session.storage.api.SessionStorage;
+import com.lelar.util.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -25,12 +27,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final SessionStorage sessionStorage;
-    private final Collector<LoginRequest, LoginResponse> collector;
+    private final GetService<LoginRequest, LoginResponse> getService;
+    private final GetService<RegisterRequest, LoginResponse> registerService;
 
     @PostMapping(path = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public LoginResponse login(@RequestBody LoginRequest request, @RequestHeader("Session-Id") String sessionId) throws ApplicationException {
-        LoginResponse response = collector.collect(request);
+    public LoginResponse login(@RequestBody LoginRequest request, @RequestHeader(Constants.SESSION_ID_HEADER) String sessionId) throws ApplicationException {
+        LoginResponse response = getService.get(request);
 
         sessionStorage.put(sessionId, SessionDataMapper.INSTANCE.map(response));
 
@@ -38,12 +41,22 @@ public class AuthController {
     }
 
     @GetMapping(path = "/logout", produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse<String> logout(@RequestHeader("Session-Id") String sessionId) {
+    public BaseResponse<String> logout(@RequestHeader(Constants.SESSION_ID_HEADER) String sessionId) {
         sessionStorage.clean(sessionId);
 
         return BaseResponse.<String>builder()
-                .success(true)
-                .build();
+            .success(true)
+            .build();
+    }
+
+    @PostMapping(path = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public LoginResponse register(@RequestBody RegisterRequest request, @RequestHeader(Constants.SESSION_ID_HEADER) String sessionId) throws ApplicationException {
+        LoginResponse response = registerService.get(request);
+
+        sessionStorage.put(sessionId, SessionDataMapper.INSTANCE.map(response));
+
+        return response;
     }
 
 }

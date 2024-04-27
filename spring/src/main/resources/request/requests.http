@@ -9,22 +9,52 @@ Session-Id: sessionId
 
 ###
 
+POST http://localhost:8080/auth/register
+Content-Type: application/json
+Session-Id: sessionId
+
+{
+  "username": "lelar2",
+  "password": "qwerty12345"
+}
+
+###
+
 POST http://localhost:8080/tournament/getBetween
 Content-Type: application/json
 
 {
   "startBeginDate": "2020-01-01T00:00:00",
-  "startEndDate": "2021-11-01T00:00:00"
+  "startEndDate": "2021-11-01T00:00:00",
+  "needToLoadPictures": false
 }
 
 ###
 
-POST http://localhost:8080/pictures/get
+POST http://localhost:8080/tournament/update
+Content-Type: application/json
+Session-Id: sessionId
+
+{
+  "entity": {
+    "id": 1,
+    "tournamentName": "name",
+    "startDate": "2020-10-01T00:00:00",
+    "endDate": "2021-10-01T00:00:00",
+    "genderType": "M",
+    "squadId": 1,
+    "opponentSquadId": 2,
+    "address": "address"
+  }
+}
+
+###
+
+POST http://localhost:8080/pictures/getByPath
 Content-Type: application/json
 
 {
-  "startBeginDate": "2020-01-01T00:00:00",
-  "startEndDate": "2021-11-01T00:00:00"
+  "path": "/pictures/image.jpg"
 }
 
 ###
