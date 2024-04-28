@@ -3,9 +3,9 @@ values (next value for seq_pk_login_id, 'lelar', 'qwerty12345'),
        (next value for seq_pk_login_id, 'qwerty', 'qwerty12345');
 
 insert into permissions
-values (next value for seq_pk_permission_id, 'Permission 1'),
-       (next value for seq_pk_permission_id, 'Permission 2'),
-       (next value for seq_pk_permission_id, 'Permission 3');
+values (next value for seq_pk_permission_id, 'Permission 1', false),
+       (next value for seq_pk_permission_id, 'Permission 2', true),
+       (next value for seq_pk_permission_id, 'Permission 3', true);
 
 insert into users
 values (next value for seq_pk_user_id, 1, 'firstName', 'secondName', 'patrName'),

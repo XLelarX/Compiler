@@ -1,7 +1,8 @@
 create table if not exists permissions
 (
-    id   number       not null,
-    name varchar(255) not null,
+    id            number       not null,
+    name          varchar(255) not null,
+    default_value boolean,
     constraint pk_permission_id primary key (id)
 );
 create sequence if not exists seq_pk_permission_id start with 1 increment by 1;
@@ -57,7 +58,7 @@ create sequence if not exists seq_pk_user_id start with 1 increment by 1;
 create table if not exists tournaments
 (
     id                 number       not null,
-    tournament_name               varchar(255) not null,
+    tournament_name    varchar(255) not null,
     start_date         timestamp    not null,
     end_date           timestamp    not null,
     squad_id           number,

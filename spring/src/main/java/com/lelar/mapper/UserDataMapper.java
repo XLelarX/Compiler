@@ -2,6 +2,7 @@ package com.lelar.mapper;
 
 import com.lelar.database.entity.SquadEntity;
 import com.lelar.database.entity.UserEntity;
+import com.lelar.dto.login.RegisterRequest;
 import com.lelar.dto.login.SquadData;
 import com.lelar.dto.login.UserData;
 import org.mapstruct.Mapper;
@@ -24,5 +25,7 @@ public interface UserDataMapper {
     SquadData map(SquadEntity entity);
 
     UserData map(UserEntity entity);
+
+    UserData map(RegisterRequest request);
 
 }

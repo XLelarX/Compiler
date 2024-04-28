@@ -14,7 +14,10 @@ Content-Type: application/json
 Session-Id: sessionId
 
 {
-  "username": "lelar2",
+  "username": "username",
+  "firstName": "firstName",
+  "secondName": "secondName",
+  "patronymic": "patronymic",
   "password": "qwerty12345"
 }
 

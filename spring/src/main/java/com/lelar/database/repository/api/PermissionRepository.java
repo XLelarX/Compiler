@@ -5,6 +5,8 @@ import com.lelar.database.repository.api.base.InsertAndUpdateRepository;
 
 import java.util.List;
 
-public interface PermissionRepository extends InsertAndUpdateRepository<PermissionEntity> {
+public interface PermissionRepository  {
     List<PermissionEntity> findByUserId(Long userId);
+
+    void insertIntoBindingTable(Long permissionId, Long userId, boolean allowed);
 }
