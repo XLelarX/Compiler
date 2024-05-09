@@ -7,7 +7,7 @@ Session-Id: sessionId
   "password": "qwerty12345"
 }
 
-###
+### register
 
 POST http://localhost:8080/auth/register
 Content-Type: application/json
@@ -18,7 +18,22 @@ Session-Id: sessionId
   "firstName": "firstName",
   "secondName": "secondName",
   "patronymic": "patronymic",
-  "password": "qwerty12345"
+  "password": "qwerty12345",
+  "birthDate": "1999-10-01T19:42:01"
+}
+
+###
+
+POST http://localhost:8080/auth/test
+Content-Type: application/json
+Session-Id: sessionId
+
+{
+  "username": "username",
+  "firstName": "firstName",
+  "secondName": "secondName",
+  "patronymic": "patronymic",
+  "password": "jdbc:h2:mem:ee2719e7-7028-41ab-8a62-db40b0d3f389"
 }
 
 ###
@@ -29,7 +44,7 @@ Content-Type: application/json
 {
   "startBeginDate": "2020-01-01T00:00:00",
   "startEndDate": "2021-11-01T00:00:00",
-  "needToLoadPictures": false
+  "needToLoadPictures": true
 }
 
 ###

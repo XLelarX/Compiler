@@ -1,19 +1,28 @@
 package com.lelar.database.entity;
 
-import com.lelar.database.annotation.Column;
-import com.lelar.database.annotation.Table;
+import com.lelar.database.annotation.Sequence;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 import static com.lelar.database.entity.LoginEntity.Names.LOGIN;
 import static com.lelar.database.entity.LoginEntity.Names.PASSWORD;
-import static com.lelar.database.entity.LoginEntity.Names.SEQUENCE_NAME;
 import static com.lelar.database.entity.LoginEntity.Names.TABLE_NAME;
+import static com.lelar.database.entity.LoginEntity.Names.SEQUENCE_NAME;
+import static com.lelar.database.entity.LoginEntity.Names.USER_ID;
 
 @Data
 @Accessors(chain = true)
-@Table(name = TABLE_NAME, sequence = SEQUENCE_NAME)
-public class LoginEntity extends IdentifierEntity {
+@Table(TABLE_NAME)
+@Sequence(SEQUENCE_NAME)
+public class LoginEntity implements Persistable<Long> {
+
+    @Id
+    private Long id;
 
     @Column(LOGIN)
     private String login;
@@ -21,11 +30,20 @@ public class LoginEntity extends IdentifierEntity {
     @Column(PASSWORD)
     private String password;
 
-    public interface Names {
-        String TABLE_NAME = "logins";
-        String SEQUENCE_NAME = "seq_pk_login_id";
+    @Column(USER_ID)
+    private AggregateReference<UserEntity, Long> userId;
 
-        String LOGIN = "login";
-        String PASSWORD = "password";
+    @Override
+    public boolean isNew() {
+        return false;
+    }
+
+    public interface Names {
+        String TABLE_NAME = "LOGINS";
+        String SEQUENCE_NAME = "SEQ_PK_LOGIN_ID";
+
+        String LOGIN = "LOGIN";
+        String PASSWORD = "PASSWORD";
+        String USER_ID = "USER_ID";
     }
 }

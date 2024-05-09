@@ -1,12 +1,12 @@
 package com.lelar.controller;
 
-import com.lelar.service.get.api.GetService;
+import com.lelar.service.get.api.ObtainDataProcessor;
 import com.lelar.dto.tournament.get.GetTournamentRequest;
 import com.lelar.dto.tournament.get.GetTournamentResponse;
 import com.lelar.dto.tournament.update.UpdateTournamentRequest;
 import com.lelar.dto.tournament.update.UpdateTournamentResponse;
 import com.lelar.exception.ApplicationException;
-import com.lelar.service.update.api.UpdateService;
+import com.lelar.service.update.api.UpdateDataService;
 import com.lelar.util.Constants;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -21,13 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/tournament")
 public class TournamentController {
-    private final GetService<GetTournamentRequest, GetTournamentResponse> getService;
-    private final UpdateService<UpdateTournamentRequest> updateService;
+    private final ObtainDataProcessor<GetTournamentRequest, GetTournamentResponse> obtainDataProcessor;
+    private final UpdateDataService<UpdateTournamentRequest> updateService;
 
     @PostMapping(value = "/getBetween", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public GetTournamentResponse getTournaments(@RequestBody GetTournamentRequest request) throws ApplicationException {
-        return getService.get(request);
+        return obtainDataProcessor.process(request);
     }
 
     @PostMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)

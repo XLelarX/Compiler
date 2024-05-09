@@ -7,4 +7,5 @@ import lombok.Data;
 public class UpdateTournamentRequest {
     private TournamentEntity entity;
 
+
 }

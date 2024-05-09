@@ -23,7 +23,7 @@
                         <port>9999</port>
                     </httpConnector>
                     <!--<webApp>-->
-                    <!--<contextPath>/user-system</contextPath>-->
+                    <!--<contextPath>/userId-system</contextPath>-->
                     <!--</webApp>-->
                 </configuration>
             </plugin>

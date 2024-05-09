@@ -4,10 +4,10 @@ import com.lelar.dto.tournament.Tournament;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Accessors(chain = true)
 public class GetTournamentResponse {
-    private List<Tournament> tournaments;
+    private Set<Tournament> tournaments;
 }

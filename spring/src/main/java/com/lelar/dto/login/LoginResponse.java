@@ -3,11 +3,12 @@ package com.lelar.dto.login;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Accessors(chain = true)
 public class LoginResponse {
-    private List<Permission> permissions;
-    private UserData userData;
+    private User user;
+    private Set<Squad> squads;
+    private Set<Permission> permissions;
 }

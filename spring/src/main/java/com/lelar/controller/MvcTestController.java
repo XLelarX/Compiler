@@ -32,5 +32,4 @@ public class MvcTestController {
         return "test";
     }
 
-
 }

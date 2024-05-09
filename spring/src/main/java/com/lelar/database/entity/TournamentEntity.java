@@ -1,51 +1,82 @@
 package com.lelar.database.entity;
 
-import com.lelar.database.annotation.Column;
-import com.lelar.database.annotation.Table;
+import com.lelar.database.annotation.Sequence;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.MappedCollection;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.sql.Timestamp;
+import java.util.Set;
 
+import static com.lelar.database.entity.TournamentEntity.Names.ADDRESS;
+import static com.lelar.database.entity.TournamentEntity.Names.END_DATE;
+import static com.lelar.database.entity.TournamentEntity.Names.GENDER_TYPE;
+import static com.lelar.database.entity.TournamentEntity.Names.NAME;
+import static com.lelar.database.entity.TournamentEntity.Names.OPPONENT_SQUAD_ID;
 import static com.lelar.database.entity.TournamentEntity.Names.SEQUENCE_NAME;
+import static com.lelar.database.entity.TournamentEntity.Names.SQUAD_ID;
+import static com.lelar.database.entity.TournamentEntity.Names.START_DATE;
 import static com.lelar.database.entity.TournamentEntity.Names.TABLE_NAME;
 
 @Data
 @Accessors(chain = true)
-@Table(name = TABLE_NAME, sequence = SEQUENCE_NAME)
-public class TournamentEntity extends IdentifierEntity {
-    @Column(Names.NAME)
+@Table(TABLE_NAME)
+@Sequence(SEQUENCE_NAME)
+public class TournamentEntity implements Persistable<Long> {
+
+    @Id
+    private Long id;
+
+    @Column(NAME)
     private String tournamentName;
 
-    @Column(Names.START_DATE)
+    @Column(START_DATE)
     private Timestamp startDate;
 
-    @Column(Names.END_DATE)
+    @Column(END_DATE)
     private Timestamp endDate;
 
-    @Column(Names.GENDER_TYPE)
+    @Column(GENDER_TYPE)
     private String genderType;
 
-    @Column(Names.SQUAD_ID)
-    private Long squadId;
+    @Column(SQUAD_ID)
+    private AggregateReference<SquadEntity, Long> squadId;
 
-    @Column(Names.OPPONENT_SQUAD_ID)
-    private Long opponentSquadId;
+    @Column(OPPONENT_SQUAD_ID)
+    private AggregateReference<SquadEntity, Long> opponentSquadId;
 
-    @Column(Names.ADDRESS)
+    @Column(ADDRESS)
     private String address;
 
+    @MappedCollection(idColumn = "TOURNAMENT_ID", keyColumn = "PICTURE_ID")
+    private Set<PictureBindingEntity> tournamentPictureRefs;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return true;
+    }
+
     public interface Names {
-        String TABLE_NAME = "tournaments";
+        String TABLE_NAME = "TOURNAMENTS";
 
-        String SEQUENCE_NAME = "seq_pk_tournaments_id";
+        String SEQUENCE_NAME = "SEQ_PK_TOURNAMENTS_ID";
 
-        String NAME = "tournament_name";
-        String START_DATE = "start_date";
-        String END_DATE = "end_date";
-        String GENDER_TYPE = "gender_type";
-        String SQUAD_ID = "squad_id";
-        String OPPONENT_SQUAD_ID = "opponents_squad_id";
-        String ADDRESS = "address";
+        String NAME = "TOURNAMENT_NAME";
+        String START_DATE = "START_DATE";
+        String END_DATE = "END_DATE";
+        String GENDER_TYPE = "GENDER_TYPE";
+        String SQUAD_ID = "SQUAD_ID";
+        String OPPONENT_SQUAD_ID = "OPPONENTS_SQUAD_ID";
+        String ADDRESS = "ADDRESS";
     }
 }

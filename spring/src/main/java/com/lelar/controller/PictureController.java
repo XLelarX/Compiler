@@ -1,6 +1,6 @@
 package com.lelar.controller;
 
-import com.lelar.service.get.api.GetService;
+import com.lelar.service.get.api.ObtainDataProcessor;
 import com.lelar.dto.PictureRequest;
 import com.lelar.exception.ApplicationException;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.io.InputStream;
 @RequiredArgsConstructor
 @RequestMapping("/pictures")
 public class PictureController {
-    private final GetService<PictureRequest, InputStream> getService;
+    private final ObtainDataProcessor<PictureRequest, InputStream> obtainDataProcessor;
 
     @PostMapping(
         value = "/getByPath",
@@ -27,7 +27,7 @@ public class PictureController {
     )
     @ResponseBody
     public byte[] getPicture(@RequestBody PictureRequest request) throws ApplicationException, IOException {
-        InputStream in = getService.get(request);
+        InputStream in = obtainDataProcessor.process(request);
 
         return in.readAllBytes();
     }
