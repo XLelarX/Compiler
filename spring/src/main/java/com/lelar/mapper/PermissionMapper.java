@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mapper
-public interface PermissionMapper {
+public interface PermissionMapper extends CommonMapper {
     PermissionMapper INSTANCE = Mappers.getMapper(PermissionMapper.class);
 
     default Set<Permission> mapPermissions(List<PermissionEntity> entities, Map<Long, Boolean> permissionsAdditionalData) {
@@ -37,11 +37,6 @@ public interface PermissionMapper {
 
     @Mapping(target = "allowed", source = "defaultValue")
     Permission map(PermissionEntity entity);
-
-
-    default <T> AggregateReference<PermissionEntity, Long> mapId(Long id) {
-        return AggregateReference.to(id);
-    }
 
     @Mapping(target = "allowed", source = "defaultValue")
     @Mapping(target = "permissionId", source = "id")

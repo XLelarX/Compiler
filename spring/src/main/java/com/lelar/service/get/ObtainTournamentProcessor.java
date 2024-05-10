@@ -1,8 +1,11 @@
 package com.lelar.service.get;
 
-import com.lelar.database.entity.PictureBindingEntity;
+import com.lelar.database.dao.PictureFormatRepository;
 import com.lelar.database.dao.PictureRepository;
 import com.lelar.database.dao.TournamentRepository;
+import com.lelar.database.entity.PictureFormatEntity;
+import com.lelar.instance.PictureInstance;
+import com.lelar.instance.TournamentInstance;
 import com.lelar.service.get.api.ObtainDataProcessor;
 import com.lelar.database.entity.PictureEntity;
 import com.lelar.database.entity.TournamentEntity;
@@ -12,7 +15,6 @@ import com.lelar.exception.ApplicationException;
 import com.lelar.mapper.TournamentMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.stereotype.Component;
 
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 public class ObtainTournamentProcessor implements ObtainDataProcessor<GetTournamentRequest, GetTournamentResponse> {
     private final TournamentRepository tournamentRepository;
     private final PictureRepository pictureRepository;
+    private final PictureFormatRepository pictureFormatRepository;
 
     @Override
     public GetTournamentResponse process(GetTournamentRequest request) throws ApplicationException {
@@ -36,28 +39,61 @@ public class ObtainTournamentProcessor implements ObtainDataProcessor<GetTournam
             request.getStartEndDate()
         );
 
-        Map<TournamentEntity, Set<PictureEntity>> tournamentToPictures = Map.of();
+        List<PictureEntity> pictures = List.of();
+        List<PictureFormatEntity> formats = List.of();
 
         if (BooleanUtils.isTrue(request.isNeedToLoadPictures())) {
-            Map<TournamentEntity, Set<Long>> tournamentsAndPictures = tournaments.stream()
-                .collect(Collectors.toMap(Function.identity(), it -> it.getTournamentPictureRefs().stream()
-                    .map(PictureBindingEntity::getPictureId)
-                    .map(AggregateReference::getId).collect(Collectors.toSet())));
-
-            Set<Long> pictureIds = tournamentsAndPictures.values().stream()
-                .flatMap(Collection::stream)
+            Set<Long> pictureIds = tournaments.stream()
+                .map(TournamentEntity::getTournamentPictureRefs)
+                .flatMap(Collection::stream).map(it -> it.getTournamentId().getId())
                 .collect(Collectors.toSet());
+            pictures = pictureRepository.findAllById(pictureIds);
 
-            Map<Long, PictureEntity> pictures = pictureRepository.findAllById(pictureIds).stream()
-                .collect(Collectors.toMap(PictureEntity::getId, Function.identity()));
-
-            tournamentToPictures = tournamentsAndPictures.entrySet().stream()
-                .map(it -> Pair.of(it.getKey(), it.getValue().stream().map(pictures::get).collect(Collectors.toSet())))
-                .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));
+            Set<Long> formatIds = pictures.stream()
+                .map(PictureEntity::getFormatId)
+                .map(AggregateReference::getId)
+                .collect(Collectors.toSet());
+            formats = pictureFormatRepository.findAllById(formatIds);
         }
 
-        return new GetTournamentResponse()
-            .setTournaments(TournamentMapper.INSTANCE.map(tournaments, tournamentToPictures));
+        Set<TournamentInstance> tournamentInstances = createInstances(tournaments, pictures, formats);
+
+        return new GetTournamentResponse().setTournaments(tournamentInstances.stream().map(TournamentMapper.INSTANCE::map).collect(Collectors.toSet()));
+    }
+
+    private Set<TournamentInstance> createInstances(
+        List<TournamentEntity> tournaments,
+        List<PictureEntity> pictures,
+        List<PictureFormatEntity> formats
+    ) {
+        Map<Long, PictureEntity> pictureWithIds = pictures.stream()
+            .collect(Collectors.toMap(PictureEntity::getId, Function.identity()));
+        Map<Long, PictureFormatEntity> formatWithIds = formats.stream()
+            .collect(Collectors.toMap(PictureFormatEntity::getId, Function.identity()));
+
+        Set<TournamentInstance> tournamentInstances = tournaments.stream()
+            .map(TournamentMapper.INSTANCE::mapToInstance).collect(Collectors.toSet());
+
+        tournamentInstances.forEach(
+            it -> it.getPictures().forEach(
+                picture -> enrichPicture(pictureWithIds, formatWithIds, picture)
+            )
+        );
+
+        return tournamentInstances;
+    }
+
+    private void enrichPicture(
+        Map<Long, PictureEntity> pictureWithIds,
+        Map<Long, PictureFormatEntity> formatWithIds,
+        PictureInstance picture
+    ) {
+        PictureEntity entity = pictureWithIds.get(picture.getId());
+
+        picture.setId(entity.getId());
+        picture.setLocalPath(entity.getLocalPath());
+        picture.setServerPath(entity.getServerPath());
+        picture.setFormat(formatWithIds.get(picture.getId()).getFormat());
     }
 
 }

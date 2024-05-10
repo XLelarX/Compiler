@@ -54,16 +54,20 @@ Content-Type: application/json
 Session-Id: sessionId
 
 {
-  "entity": {
-    "id": 1,
-    "tournamentName": "name",
-    "startDate": "2020-10-01T00:00:00",
-    "endDate": "2021-10-01T00:00:00",
-    "genderType": "M",
-    "squadId": 1,
-    "opponentSquadId": 2,
-    "address": "address"
-  }
+  "tournamentName": "name",
+  "startDate": "2020-10-01T00:00:00",
+  "endDate": "2021-10-01T00:00:00",
+  "genderType": "M",
+  "squadId": 1,
+  "opponentSquadId": 2,
+  "address": "address",
+  "pictures": [
+    {
+      "format": "jpg",
+      "serverPath": "serverPath",
+      "localPath": "localPath"
+    }
+  ]
 }
 
 ###

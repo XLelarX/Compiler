@@ -7,7 +7,4 @@ import org.springframework.data.repository.ListCrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface PictureRepository extends ListCrudRepository<PictureEntity, Long> {
-
-    @Query("SELECT * FROM LOGINS WHERE LOGIN = :login")
-    LoginEntity findByLogin(@Param("login") String login);
 }

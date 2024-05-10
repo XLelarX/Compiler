@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 @Mapper
-public interface UserMapper {
+public interface UserMapper extends CommonMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
     User map(UserEntity entity);
@@ -19,9 +19,5 @@ public interface UserMapper {
     @Mapping(target = "login.password", source = "password")
     @Mapping(target = "login.login", source = "username")
     UserEntity map(RegisterRequest entity);
-
-    default Timestamp mapLocalDateTime(LocalDateTime localDateTime) {
-        return Timestamp.valueOf(localDateTime);
-    }
 
 }
