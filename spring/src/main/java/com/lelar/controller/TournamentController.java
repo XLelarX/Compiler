@@ -1,5 +1,6 @@
 package com.lelar.controller;
 
+import com.lelar.dto.BaseResponse;
 import com.lelar.service.get.api.ObtainDataProcessor;
 import com.lelar.dto.tournament.get.GetTournamentRequest;
 import com.lelar.dto.tournament.get.GetTournamentResponse;
@@ -26,18 +27,18 @@ public class TournamentController {
 
     @PostMapping(value = "/getBetween", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public GetTournamentResponse getTournaments(@RequestBody GetTournamentRequest request) throws ApplicationException {
-        return obtainDataProcessor.process(request);
+    public BaseResponse<GetTournamentResponse> getTournaments(@RequestBody GetTournamentRequest request) throws ApplicationException {
+        return BaseResponse.successResponse(obtainDataProcessor.process(request));
     }
 
     @PostMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public UpdateTournamentResponse updateTournament(
+    public BaseResponse<UpdateTournamentResponse> updateTournament(
         @RequestBody UpdateTournamentRequest request,
         @RequestHeader(Constants.SESSION_ID_HEADER) String sessionId
     ) throws ApplicationException {
-        boolean update = updateService.update(request);
-        return new UpdateTournamentResponse();
+        updateService.update(request);
+        return BaseResponse.emptySuccessResponse();
     }
 
 }

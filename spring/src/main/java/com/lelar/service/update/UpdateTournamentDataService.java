@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 @Service
 @Data
-public class UpdateDataTournamentService implements UpdateDataService<UpdateTournamentRequest> {
+public class UpdateTournamentDataService implements UpdateDataService<UpdateTournamentRequest> {
 
     private final TournamentRepository tournamentRepository;
     private final PictureRepository pictureRepository;
@@ -32,7 +32,7 @@ public class UpdateDataTournamentService implements UpdateDataService<UpdateTour
 
     //TODO Отрефачить
     @Override
-    public boolean update(UpdateTournamentRequest request) throws ApplicationException {
+    public void update(UpdateTournamentRequest request) throws ApplicationException {
         //TODO Добавить проверку на формат картинки
 
         Set<Picture> pictures = request.getPictures();
@@ -40,7 +40,9 @@ public class UpdateDataTournamentService implements UpdateDataService<UpdateTour
         Set<String> pictureFormats = pictures.stream().map(Picture::getFormat).collect(Collectors.toSet());
         List<PictureFormatEntity> allBy = pictureFormatRepository.findAllBy(pictureFormats);
 
-        Map<String, Long> map = allBy.stream().collect(Collectors.toMap(PictureFormatEntity::getFormat, PictureFormatEntity::getId));
+        Map<String, Long> map = allBy.stream().collect(
+            Collectors.toMap(PictureFormatEntity::getFormat, PictureFormatEntity::getId)
+        );
 
         Set<PictureEntity> pictureEntities = pictures.stream()
             .map(it -> PictureMapper.INSTANCE.map(it, map))
@@ -59,8 +61,6 @@ public class UpdateDataTournamentService implements UpdateDataService<UpdateTour
         ).collect(Collectors.toSet());
         entity.setTournamentPictureRefs(collect);
         tournamentRepository.save(entity);
-
-        return true;
     }
 
 }

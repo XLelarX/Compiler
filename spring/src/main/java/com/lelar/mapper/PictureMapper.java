@@ -24,24 +24,6 @@ import java.util.stream.Collectors;
 public interface PictureMapper {
     PictureMapper INSTANCE = Mappers.getMapper(PictureMapper.class);
 
-//    default Set<Tournament> map(List<TournamentEntity> entity, Map<TournamentEntity, Set<PictureEntity>> pictures) {
-//        return entity.stream()
-//            .map(it -> mapTournamentWithInsides(pictures, it))
-//            .collect(Collectors.toSet());
-//    }
-//
-//    default Tournament mapTournamentWithInsides(Map<TournamentEntity, Set<PictureEntity>> pictures, TournamentEntity it) {
-//        Tournament map = map(it);
-//        if (!CollectionUtils.isEmpty(pictures)) {
-//            map.setPictures(pictures.getOrDefault(it, Set.of()).stream().map(this::map).collect(Collectors.toSet()));
-//        }
-//        return map;
-//    }
-//
-//    Tournament map(TournamentEntity entity);
-//
-//    TournamentEntity map(UpdateTournamentRequest request);
-
     Picture map(PictureEntity entity);
 
     @Mapping(target = "formatId", source = "format", qualifiedByName = "mapFormat")

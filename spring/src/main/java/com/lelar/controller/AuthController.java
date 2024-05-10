@@ -32,31 +32,29 @@ public class AuthController {
 
     @PostMapping(path = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public LoginResponse login(@RequestBody LoginRequest request, @RequestHeader(Constants.SESSION_ID_HEADER) String sessionId) throws ApplicationException {
+    public BaseResponse<LoginResponse> login(@RequestBody LoginRequest request, @RequestHeader(Constants.SESSION_ID_HEADER) String sessionId) throws ApplicationException {
         LoginResponse response = obtainDataProcessor.process(request);
 
         sessionStorage.put(sessionId, SessionDataMapper.INSTANCE.map(response));
 
-        return response;
+        return BaseResponse.successResponse(response);
     }
 
     @GetMapping(path = "/logout", produces = MediaType.APPLICATION_JSON_VALUE)
-    public BaseResponse<String> logout(@RequestHeader(Constants.SESSION_ID_HEADER) String sessionId) {
+    public BaseResponse<Void> logout(@RequestHeader(Constants.SESSION_ID_HEADER) String sessionId) {
         sessionStorage.clean(sessionId);
 
-        return BaseResponse.<String>builder()
-            .success(true)
-            .build();
+        return BaseResponse.emptySuccessResponse();
     }
 
     @PostMapping(path = "/register", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
-    public LoginResponse register(@RequestBody RegisterRequest request, @RequestHeader(Constants.SESSION_ID_HEADER) String sessionId) throws ApplicationException {
+    public BaseResponse<LoginResponse> register(@RequestBody RegisterRequest request, @RequestHeader(Constants.SESSION_ID_HEADER) String sessionId) throws ApplicationException {
         LoginResponse response = registerService.process(request);
 
         sessionStorage.put(sessionId, SessionDataMapper.INSTANCE.map(response));
 
-        return response;
+        return BaseResponse.successResponse(response);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.lelar.exception.handler;
 
+import com.lelar.dto.BaseResponse;
 import com.lelar.exception.ApplicationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -14,7 +15,7 @@ public class ApplicationExceptionHandler extends ResponseEntityExceptionHandler 
 
     @ExceptionHandler({ApplicationException.class})
     public ResponseEntity<Object> handler(ApplicationException e, WebRequest request) {
-        String body = "{\"errorMessage\":\"%s\" }".formatted(e.getMessage());
+        BaseResponse<Object> body = BaseResponse.failureResponse(e.getMessage());
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.add(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE);
         return handleExceptionInternal(e, body, httpHeaders, e.getStatus(), request);
