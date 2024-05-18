@@ -1,7 +1,6 @@
-package com.lelar.session.storage;
+package com.lelar.storage.session;
 
-import com.lelar.session.SessionData;
-import com.lelar.session.storage.api.SessionStorage;
+import com.lelar.storage.session.api.SessionStorage;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

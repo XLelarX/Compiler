@@ -1,4 +1,4 @@
-package com.lelar.controller;
+package com.lelar.controller.rest;
 
 import com.lelar.dto.BaseResponse;
 import com.lelar.service.get.api.ObtainDataProcessor;

@@ -18,7 +18,7 @@ create sequence if not exists seq_pk_squad_id start with 1 increment by 1;
 create table if not exists picture_formats
 (
     id     number     not null,
-    format varchar(3) not null,
+    format varchar(5) not null,
     constraint pk_picture_format_id primary key (id)
 );
 create sequence if not exists seq_pk_picture_formats_id start with 1 increment by 1;

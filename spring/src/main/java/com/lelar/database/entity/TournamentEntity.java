@@ -1,10 +1,9 @@
 package com.lelar.database.entity;
 
 import com.lelar.database.annotation.Sequence;
+import com.lelar.database.entity.id.IdentifierEntity;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
@@ -27,10 +26,7 @@ import static com.lelar.database.entity.TournamentEntity.Names.TABLE_NAME;
 @Accessors(chain = true)
 @Table(TABLE_NAME)
 @Sequence(SEQUENCE_NAME)
-public class TournamentEntity implements Persistable<Long> {
-
-    @Id
-    private Long id;
+public class TournamentEntity extends IdentifierEntity {
 
     @Column(NAME)
     private String tournamentName;
@@ -55,16 +51,6 @@ public class TournamentEntity implements Persistable<Long> {
 
     @MappedCollection(idColumn = "TOURNAMENT_ID", keyColumn = "PICTURE_ID")
     private Set<PictureBindingEntity> tournamentPictureRefs;
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    @Override
-    public boolean isNew() {
-        return true;
-    }
 
     public interface Names {
         String TABLE_NAME = "TOURNAMENTS";

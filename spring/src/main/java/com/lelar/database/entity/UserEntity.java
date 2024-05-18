@@ -1,10 +1,9 @@
 package com.lelar.database.entity;
 
 import com.lelar.database.annotation.Sequence;
+import com.lelar.database.entity.id.IdentifierEntity;
 import lombok.Data;
 import lombok.experimental.Accessors;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
@@ -23,10 +22,7 @@ import static com.lelar.database.entity.UserEntity.Names.TABLE_NAME;
 @Accessors(chain = true)
 @Table(TABLE_NAME)
 @Sequence(SEQUENCE_NAME)
-public class UserEntity implements Persistable<Long> {
-
-    @Id
-    private Long id;
+public class UserEntity extends IdentifierEntity {
 
     @Column(FIRST_NAME)
     private String firstName;
@@ -48,11 +44,6 @@ public class UserEntity implements Persistable<Long> {
 
     @MappedCollection(idColumn = "USER_ID")
     private LoginEntity login;
-
-    @Override
-    public boolean isNew() {
-        return true;
-    }
 
     public interface Names {
         String TABLE_NAME = "USERS";

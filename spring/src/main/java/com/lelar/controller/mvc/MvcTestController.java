@@ -1,6 +1,5 @@
-package com.lelar.controller;
+package com.lelar.controller.mvc;
 
-import com.lelar.data.DataClass;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

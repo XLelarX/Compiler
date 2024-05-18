@@ -1,6 +1,6 @@
-package com.lelar.session.storage.api;
+package com.lelar.storage.session.api;
 
-import com.lelar.session.SessionData;
+import com.lelar.storage.session.SessionData;
 
 public interface SessionStorage {
     SessionData pull(String sessionId);

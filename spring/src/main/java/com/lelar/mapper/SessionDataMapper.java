@@ -1,7 +1,7 @@
 package com.lelar.mapper;
 
 import com.lelar.dto.login.LoginResponse;
-import com.lelar.session.SessionData;
+import com.lelar.storage.session.SessionData;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

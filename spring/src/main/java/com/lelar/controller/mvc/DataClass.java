@@ -1,4 +1,4 @@
-package com.lelar.data;
+package com.lelar.controller.mvc;
 
 import lombok.Data;
 

@@ -1,4 +1,4 @@
-package com.lelar.session;
+package com.lelar.storage.session;
 
 import com.lelar.dto.login.Permission;
 import com.lelar.dto.login.User;
