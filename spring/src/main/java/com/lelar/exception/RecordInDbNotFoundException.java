@@ -10,6 +10,6 @@ public class RecordInDbNotFoundException extends ApplicationException {
     }
 
     public static RecordInDbNotFoundException of(String tableName) {
-        return new RecordInDbNotFoundException(ERROR_MESSAGE_PATTERN.formatted(tableName));
+        return new RecordInDbNotFoundException(String.format(ERROR_MESSAGE_PATTERN, tableName));
     }
 }

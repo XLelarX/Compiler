@@ -27,7 +27,7 @@ public class StorePictureServiceImpl implements StorePictureService {
         }
         String fileName = UUID.randomUUID().toString().replace("-", "");
 
-        String fileFullName = PICTURE_BASE_PATH.formatted(fileName, fileType);
+        String fileFullName = String.format(PICTURE_BASE_PATH, fileName, fileType);
 
         Files.write(Path.of(fileFullName), multipartFile.getInputStream().readAllBytes(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
 

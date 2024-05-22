@@ -23,7 +23,7 @@ public class QueryHelper implements ApplicationContextAware {
 
     public static Long getSequenceNextValue(Class<?> clazz) {
         PreparedStatementCreatorFactory nextValueRequest = new PreparedStatementCreatorFactory(
-            "SELECT NEXT VALUE FOR %s AS result".formatted(clazz.getAnnotation(Sequence.class).value())
+            String.format("SELECT NEXT VALUE FOR %s AS result", clazz.getAnnotation(Sequence.class).value())
         );
         PreparedStatementCreator preparedStatementCreator = nextValueRequest.newPreparedStatementCreator(List.of());
         return getJdbcTemplate().execute(preparedStatementCreator, it -> {
