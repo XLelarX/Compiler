@@ -9,7 +9,7 @@ Session-Id: sessionId
 
 ### logout
 
-GET http://localhost:8080/auth/login
+GET http://localhost:8080/auth/logout
 Content-Type: application/json
 Session-Id: sessionId
 
@@ -25,7 +25,8 @@ Session-Id: sessionId
   "secondName": "secondName",
   "patronymic": "patronymic",
   "password": "qwerty12345",
-  "birthDate": "1999-10-01T19:42:01"
+  "birthDate": "1999-10-01T19:42:01",
+  "gender": "MALE"
 }
 
 ###
@@ -42,20 +43,35 @@ Session-Id: sessionId
   "password": "jdbc:h2:mem:ee2719e7-7028-41ab-8a62-db40b0d3f389"
 }
 
-###
+### obtain all beach tournaments
 
-POST http://localhost:8080/tournament/getBetween
+POST http://localhost:8080/tournament/beach/get
 Content-Type: application/json
 
 {
   "startBeginDate": "2020-01-01T00:00:00",
   "startEndDate": "2021-11-01T00:00:00",
-  "needToLoadPictures": true
+  "gender": "MALE"
 }
+
+### obtain all classic tournaments
+
+POST http://localhost:8080/tournament/classic/get
+Content-Type: application/json
+
+{
+  "startBeginDate": "2020-01-01T00:00:00",
+  "startEndDate": "2021-11-01T00:00:00",
+  "gender": "MALE"
+}
+
+### obtain detail tournament
+
+GET http://localhost:8080/tournament/beach/getDetails?id=1
 
 ###
 
-POST http://localhost:8080/tournament/update
+POST http://localhost:8080/tournament/beach/update
 Content-Type: application/json
 Session-Id: sessionId
 
@@ -63,9 +79,11 @@ Session-Id: sessionId
   "tournamentName": "name",
   "startDate": "2020-10-01T00:00:00",
   "endDate": "2021-10-01T00:00:00",
-  "genderType": "M",
+  "gender": "MALE",
   "squadId": 1,
-  "opponentSquadId": 2,
+  "squadCount": 3,
+  "opponentsSquadId": 2,
+  "opponentsSquadCount": 4,
   "address": "address",
   "pictures": [
     {
@@ -73,7 +91,34 @@ Session-Id: sessionId
       "serverPath": "serverPath",
       "localPath": "localPath"
     }
-  ]
+  ],
+  "status" : "APPROVED"
+}
+
+###
+
+POST http://localhost:8080/tournament/classic/update
+Content-Type: application/json
+Session-Id: sessionId
+
+{
+  "tournamentName": "name",
+  "startDate": "2020-10-01T00:00:00",
+  "endDate": "2021-10-01T00:00:00",
+  "gender": "MALE",
+  "squadName": "squadName",
+  "squadCount": 1,
+  "opponentsSquadName": "opponentsSquadName",
+  "opponentsSquadCount": 2,
+  "address": "address",
+  "pictures": [
+    {
+      "format": "jpg",
+      "serverPath": "serverPath",
+      "localPath": "localPath"
+    }
+  ],
+  "status" : "APPROVED"
 }
 
 ###
@@ -83,6 +128,21 @@ Content-Type: application/json
 
 {
   "path": "/pictures/image.jpg"
+}
+
+###
+
+POST http://localhost:8080/squad/update
+Content-Type: application/json
+
+{
+  "squadId": 1,
+  "name": "squadName",
+  "usersIds": [
+    1,
+    2,
+    3
+  ]
 }
 
 ###

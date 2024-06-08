@@ -1,19 +1,22 @@
 package com.lelar.dto.tournament;
 
-import com.lelar.dto.picture.Picture;
+import com.lelar.dto.Gender;
+import com.lelar.dto.Status;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Data
 public class Tournament {
+    private Long id;
     private String tournamentName;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
-    private String genderType;
+    private Gender gender;
     private String squadName;
-    private String opponentSquadName;
+    private Long squadCount;
+    private String opponentsSquadName;
+    private Long opponentsSquadCount;
     private String address;
-    private Set<Picture> pictures;
+    private Status status;
 }

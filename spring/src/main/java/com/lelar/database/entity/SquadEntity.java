@@ -5,7 +5,10 @@ import com.lelar.database.entity.id.IdentifierEntity;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
+
+import java.util.Set;
 
 import static com.lelar.database.entity.SquadEntity.Names.NAME;
 import static com.lelar.database.entity.SquadEntity.Names.SEQUENCE_NAME;
@@ -19,6 +22,9 @@ public class SquadEntity extends IdentifierEntity {
 
     @Column(NAME)
     private String name;
+
+    @MappedCollection(idColumn = "SQUAD_ID", keyColumn = "USER_ID")
+    private Set<SquadBindingEntity> squadUserRefs;
 
     public interface Names {
         String TABLE_NAME = "SQUADS";

@@ -8,6 +8,6 @@ import java.util.Set;
 
 @Data
 @Accessors(chain = true)
-public class GetTournamentResponse {
+public class GetBeachTournamentResponse {
     private Set<Tournament> tournaments;
 }

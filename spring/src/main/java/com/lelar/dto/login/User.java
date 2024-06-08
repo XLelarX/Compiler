@@ -1,5 +1,6 @@
 package com.lelar.dto.login;
 
+import com.lelar.dto.Gender;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -11,5 +12,7 @@ public class User {
     private String firstName;
     private String secondName;
     private String patronymic;
+    private Gender gender;
     private LocalDateTime birthDate;
+    private Long rating;
 }

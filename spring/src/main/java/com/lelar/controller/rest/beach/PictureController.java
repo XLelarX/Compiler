@@ -1,4 +1,4 @@
-package com.lelar.controller.rest;
+package com.lelar.controller.rest.beach;
 
 import com.lelar.dto.BaseResponse;
 import com.lelar.dto.picture.get.GetPictureRequest;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,7 +29,6 @@ public class PictureController {
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.IMAGE_JPEG_VALUE
     )
-    @ResponseBody
     public byte[] getPicture(@RequestBody GetPictureRequest request) throws ApplicationException {
         return obtainDataProcessor.process(request).getByteArray();
     }
@@ -40,8 +38,7 @@ public class PictureController {
         consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @ResponseBody
-    public BaseResponse<Void> getPicture(
+    public BaseResponse<Void> storePicture(
         @RequestPart("image") MultipartFile image,
         @RequestParam("localPath") String localPath,
         @RequestParam("tournamentId") Long tournamentId

@@ -31,7 +31,7 @@ public class UpdatePictureDataService implements UpdateDataService<UpdatePicture
     private final StorePictureService storePictureService;
 
     @Override
-    public void update(UpdatePictureRequest request) throws ApplicationException {
+    public Long update(UpdatePictureRequest request) throws ApplicationException {
         Pair<String, String> storedPictureData;
         try {
             storedPictureData = storePictureService.storePicture(request.getFile());
@@ -60,6 +60,7 @@ public class UpdatePictureDataService implements UpdateDataService<UpdatePicture
             }
         );
 
+        return savedPicture.getId();
     }
 
     private PictureFormatEntity createPictureFormatEntity(Pair<String, String> storedPictureData) {

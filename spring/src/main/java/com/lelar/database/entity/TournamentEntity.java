@@ -14,12 +14,15 @@ import java.util.Set;
 
 import static com.lelar.database.entity.TournamentEntity.Names.ADDRESS;
 import static com.lelar.database.entity.TournamentEntity.Names.END_DATE;
-import static com.lelar.database.entity.TournamentEntity.Names.GENDER_TYPE;
+import static com.lelar.database.entity.TournamentEntity.Names.GENDER;
 import static com.lelar.database.entity.TournamentEntity.Names.NAME;
-import static com.lelar.database.entity.TournamentEntity.Names.OPPONENT_SQUAD_ID;
+import static com.lelar.database.entity.TournamentEntity.Names.OPPONENTS_SQUAD_COUNT;
+import static com.lelar.database.entity.TournamentEntity.Names.OPPONENTS_SQUAD_ID;
 import static com.lelar.database.entity.TournamentEntity.Names.SEQUENCE_NAME;
+import static com.lelar.database.entity.TournamentEntity.Names.SQUAD_COUNT;
 import static com.lelar.database.entity.TournamentEntity.Names.SQUAD_ID;
 import static com.lelar.database.entity.TournamentEntity.Names.START_DATE;
+import static com.lelar.database.entity.TournamentEntity.Names.STATUS_ID;
 import static com.lelar.database.entity.TournamentEntity.Names.TABLE_NAME;
 
 @Data
@@ -37,14 +40,23 @@ public class TournamentEntity extends IdentifierEntity {
     @Column(END_DATE)
     private Timestamp endDate;
 
-    @Column(GENDER_TYPE)
-    private String genderType;
+    @Column(GENDER)
+    private String gender;
+
+    @Column(SQUAD_COUNT)
+    private Long squadCount;
+
+    @Column(OPPONENTS_SQUAD_COUNT)
+    private Long opponentsSquadCount;
 
     @Column(SQUAD_ID)
     private AggregateReference<SquadEntity, Long> squadId;
 
-    @Column(OPPONENT_SQUAD_ID)
-    private AggregateReference<SquadEntity, Long> opponentSquadId;
+    @Column(OPPONENTS_SQUAD_ID)
+    private AggregateReference<SquadEntity, Long> opponentsSquadId;
+
+    @Column(STATUS_ID)
+    private AggregateReference<TournamentStatusEntity, Long> statusId;
 
     @Column(ADDRESS)
     private String address;
@@ -60,9 +72,12 @@ public class TournamentEntity extends IdentifierEntity {
         String NAME = "TOURNAMENT_NAME";
         String START_DATE = "START_DATE";
         String END_DATE = "END_DATE";
-        String GENDER_TYPE = "GENDER_TYPE";
+        String GENDER = "GENDER";
+        String SQUAD_COUNT = "SQUAD_COUNT";
+        String OPPONENTS_SQUAD_COUNT = "OPPONENTS_SQUAD_COUNT";
         String SQUAD_ID = "SQUAD_ID";
-        String OPPONENT_SQUAD_ID = "OPPONENTS_SQUAD_ID";
+        String OPPONENTS_SQUAD_ID = "OPPONENTS_SQUAD_ID";
         String ADDRESS = "ADDRESS";
+        String STATUS_ID = "STATUS_ID";
     }
 }

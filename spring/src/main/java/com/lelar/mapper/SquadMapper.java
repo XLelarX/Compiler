@@ -2,6 +2,7 @@ package com.lelar.mapper;
 
 import com.lelar.database.entity.SquadEntity;
 import com.lelar.dto.login.Squad;
+import com.lelar.instance.SquadInstance;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -20,5 +21,7 @@ public interface SquadMapper {
     }
 
     Squad map(SquadEntity entity);
+
+    SquadInstance mapToInstance(SquadEntity entity);
 
 }

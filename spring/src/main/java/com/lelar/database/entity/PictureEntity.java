@@ -29,7 +29,7 @@ public class PictureEntity extends IdentifierEntity {
     @Column(FORMAT_ID)
     private AggregateReference<PictureFormatEntity, Long> formatId;
 
-    interface Names {
+    public interface Names {
         String TABLE_NAME = "PICTURES";
 
         String SEQUENCE_NAME = "SEQ_PK_PICTURE_ID";

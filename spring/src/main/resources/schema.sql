@@ -1,8 +1,9 @@
 create table if not exists permissions
 (
-    id            number       not null,
-    name          varchar(255) not null,
-    default_value boolean,
+    id             number       not null,
+    name           varchar(255) not null,
+    permission_key varchar(255) not null,
+    default_value  boolean,
     constraint pk_permission_id primary key (id)
 );
 create sequence if not exists seq_pk_permission_id start with 1 increment by 1;
@@ -42,6 +43,8 @@ create table if not exists users
     second_name varchar(255) not null,
     patronymic  varchar(255) not null,
     birth_date  timestamp    not null,
+    gender      varchar(1)   not null,
+    rating      number                default 0,
     constraint pk_user_id primary key (id)
 );
 
@@ -56,19 +59,32 @@ create table if not exists logins
 );
 create sequence if not exists seq_pk_login_id start with 1 increment by 1;
 
+create table if not exists tournament_status
+(
+    id          number       not null,
+    status_key  varchar(255) not null,
+    description varchar(255) not null,
+    constraint pk_statuses_types_id primary key (id)
+);
+create sequence if not exists seq_pk_tournament_status_id start with 1 increment by 1;
+
 create table if not exists tournaments
 (
-    id                 number       not null,
-    tournament_name    varchar(255) not null,
-    start_date         timestamp    not null,
-    end_date           timestamp    not null,
-    squad_id           number,
-    opponents_squad_id number,
-    gender_type        varchar(1)   not null,
-    address            varchar(255) not null,
+    id                    number       not null,
+    tournament_name       varchar(255) not null,
+    start_date            timestamp    not null,
+    end_date              timestamp    not null,
+    squad_id              number,
+    opponents_squad_id    number,
+    squad_count           number,
+    opponents_squad_count number,
+    gender                varchar(1)   not null,
+    address               varchar(255) not null,
+    status_id             number       not null,
     constraint pk_tournaments_id primary key (id),
     constraint fk_tournaments_squad_id foreign key (squad_id) references squads (id),
-    constraint fk_tournaments_opponents_squad_id foreign key (opponents_squad_id) references squads (id)
+    constraint fk_tournaments_opponents_squad_id foreign key (opponents_squad_id) references squads (id),
+    constraint fk_tournaments_status_id foreign key (status_id) references tournament_status (id)
 );
 create sequence if not exists seq_pk_tournaments_id start with 1 increment by 1;
 
@@ -100,4 +116,29 @@ create table if not exists picture_bindings
     constraint fk_picture_binding_picture_id foreign key (picture_id) references pictures (id)
 );
 
---todo need to add triggers on next val primary keys and on insert PERMISSIONS table and users permissionId list
+create table if not exists classic_tournaments
+(
+    id                    number       not null,
+    tournament_name       varchar(255) not null,
+    start_date            timestamp    not null,
+    end_date              timestamp    not null,
+    squad_name            varchar(255),
+    opponents_squad_name  varchar(255),
+    squad_count           number,
+    opponents_squad_count number,
+    gender                varchar(1)   not null,
+    address               varchar(255) not null,
+    status_id             number       not null,
+    constraint pk_classic_tournaments_id primary key (id),
+    constraint fk_classic_tournaments_status_id foreign key (status_id) references tournament_status (id)
+);
+create sequence if not exists seq_pk_classic_tournaments_id start with 1 increment by 1;
+
+create table if not exists classic_picture_bindings
+(
+    tournament_id number not null,
+    picture_id    number not null,
+    constraint uc_classic_picture_bindings unique (tournament_id, picture_id),
+    constraint fk_classic_picture_bindings_tournament_id foreign key (tournament_id) references classic_tournaments (id),
+    constraint fk_classic_picture_bindings_picture_id foreign key (picture_id) references pictures (id)
+);

@@ -24,7 +24,6 @@ public class MvcTestController {
         return attributeValue;
     }
 
-
     @GetMapping(path = "/get")
     public String getTest() {
         System.out.println("dsagag");

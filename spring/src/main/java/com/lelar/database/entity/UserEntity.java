@@ -13,7 +13,9 @@ import java.util.Set;
 
 import static com.lelar.database.entity.UserEntity.Names.BIRTH_DATE;
 import static com.lelar.database.entity.UserEntity.Names.FIRST_NAME;
+import static com.lelar.database.entity.UserEntity.Names.GENDER;
 import static com.lelar.database.entity.UserEntity.Names.PATRONYMIC;
+import static com.lelar.database.entity.UserEntity.Names.RATING;
 import static com.lelar.database.entity.UserEntity.Names.SECOND_NAME;
 import static com.lelar.database.entity.UserEntity.Names.SEQUENCE_NAME;
 import static com.lelar.database.entity.UserEntity.Names.TABLE_NAME;
@@ -45,6 +47,12 @@ public class UserEntity extends IdentifierEntity {
     @MappedCollection(idColumn = "USER_ID")
     private LoginEntity login;
 
+    @Column(RATING)
+    private Long rating;
+
+    @Column(GENDER)
+    private String gender;
+
     public interface Names {
         String TABLE_NAME = "USERS";
         String SEQUENCE_NAME = "SEQ_PK_USER_ID";
@@ -53,8 +61,9 @@ public class UserEntity extends IdentifierEntity {
         String SECOND_NAME = "SECOND_NAME";
         String PATRONYMIC = "PATRONYMIC";
         String BIRTH_DATE = "BIRTH_DATE";
+        String RATING = "RATING";
+        String GENDER = "GENDER";
     }
-
 
 
 }

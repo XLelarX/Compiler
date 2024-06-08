@@ -8,6 +8,7 @@ import org.springframework.data.relational.core.mapping.Table;
 
 import static com.lelar.database.entity.PermissionEntity.Names.DEFAULT_VALUE;
 import static com.lelar.database.entity.PermissionEntity.Names.NAME;
+import static com.lelar.database.entity.PermissionEntity.Names.PERMISSION_KEY;
 import static com.lelar.database.entity.PermissionEntity.Names.TABLE_NAME;
 
 @Data
@@ -20,10 +21,14 @@ public class PermissionEntity extends IdentifierEntity {
     @Column(DEFAULT_VALUE)
     private boolean defaultValue;
 
+    @Column(PERMISSION_KEY)
+    private String permissionKey;
+
     public interface Names {
         String TABLE_NAME = "PERMISSIONS";
 
         String NAME = "NAME";
         String DEFAULT_VALUE = "DEFAULT_VALUE";
+        String PERMISSION_KEY = "PERMISSION_KEY";
     }
 }

@@ -5,5 +5,6 @@ import lombok.Data;
 @Data
 public class Permission {
     private String name;
+    private String permissionKey;
     private Boolean allowed;
 }

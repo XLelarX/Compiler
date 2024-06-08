@@ -20,7 +20,7 @@ public class PictureFormatEntity extends IdentifierEntity {
     @Column(FORMAT)
     private String format;
 
-    interface Names {
+    public interface Names {
         String TABLE_NAME = "PICTURE_FORMATS";
 
         String SEQUENCE_NAME = "SEQ_PK_PICTURE_FORMATS_ID";

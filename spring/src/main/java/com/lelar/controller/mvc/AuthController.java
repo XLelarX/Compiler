@@ -28,7 +28,7 @@
 //    public BaseResponse<LoginResponse> login(@Validated @RequestBody LoginRequest request, @RequestHeader(Constants.SESSION_ID_HEADER) String sessionId) throws ApplicationException {
 //        LoginResponse response = obtainDataProcessor.process(request);
 //
-//        sessionStorage.put(sessionId, SessionDataMapper.INSTANCE.map(response));
+//        sessionStorage.put(sessionId, SessionDataMapper.INSTANCE.mapDetails(response));
 //
 //        return BaseResponse.successResponse(response);
 //    }

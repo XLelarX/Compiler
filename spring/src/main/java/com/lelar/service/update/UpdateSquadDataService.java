@@ -1,66 +1,46 @@
-//package com.lelar.service.update;
-//
-//import com.lelar.database.dao.PictureFormatRepository;
-//import com.lelar.database.dao.PictureRepository;
-//import com.lelar.database.dao.TournamentRepository;
-//import com.lelar.database.entity.PictureBindingEntity;
-//import com.lelar.database.entity.PictureEntity;
-//import com.lelar.database.entity.PictureFormatEntity;
-//import com.lelar.database.entity.TournamentEntity;
-//import com.lelar.dto.picture.Picture;
-//import com.lelar.dto.tournament.update.UpdateTournamentRequest;
-//import com.lelar.exception.ApplicationException;
-//import com.lelar.mapper.PictureMapper;
-//import com.lelar.mapper.TournamentMapper;
-//import com.lelar.service.update.api.UpdateDataService;
-//import lombok.Data;
-//import org.springframework.data.jdbc.core.mapping.AggregateReference;
-//import org.springframework.stereotype.Service;
-//
-//import java.util.List;
-//import java.util.Map;
-//import java.util.Set;
-//import java.util.stream.Collectors;
-//
-//@Service
-//@Data
-//public class UpdateSquadDataService implements UpdateDataService<UpdateTournamentRequest> {
-//
-//    private final TournamentRepository tournamentRepository;
-//    private final PictureRepository pictureRepository;
-//    private final PictureFormatRepository pictureFormatRepository;
-//
-//    //TODO Отрефачить
-//    @Override
-//    public boolean update(UpdateTournamentRequest request) throws ApplicationException {
-//        //TODO Добавить проверку на формат картинки
-//
-//        Set<Picture> pictures = request.getPictures();
-//
-//        Set<String> pictureFormats = pictures.stream().map(Picture::getFormat).collect(Collectors.toSet());
-//        List<PictureFormatEntity> allBy = pictureFormatRepository.findAllBy(pictureFormats);
-//
-//        Map<String, Long> map = allBy.stream().collect(Collectors.toMap(PictureFormatEntity::getFormat, PictureFormatEntity::getId));
-//
-//        Set<PictureEntity> pictureEntities = pictures.stream()
-//            .map(it -> PictureMapper.INSTANCE.map(it, map))
-//            .collect(Collectors.toSet());
-//
-//        List<PictureEntity> savedPictureEntities = pictureRepository.saveAll(pictureEntities);
-//
-//        TournamentEntity entity = TournamentMapper.INSTANCE.map(request);
-//
-//        Set<PictureBindingEntity> collect = savedPictureEntities.stream().map(
-//            it -> {
-//                PictureBindingEntity pictureBindingEntity = new PictureBindingEntity();
-//                pictureBindingEntity.setPictureId(AggregateReference.to(it.getId()));
-//                return pictureBindingEntity;
-//            }
-//        ).collect(Collectors.toSet());
-//        entity.setTournamentPictureRefs(collect);
-//        tournamentRepository.save(entity);
-//
-//        return true;
-//    }
-//
-//}
+package com.lelar.service.update;
+
+import com.lelar.database.dao.PictureFormatRepository;
+import com.lelar.database.dao.PictureRepository;
+import com.lelar.database.dao.TournamentRepository;
+import com.lelar.database.entity.SquadBindingEntity;
+import com.lelar.database.entity.SquadEntity;
+import com.lelar.database.entity.UserEntity;
+import com.lelar.dto.squad.update.UpdateSquadRequest;
+import com.lelar.exception.ApplicationException;
+import com.lelar.service.update.api.UpdateDataService;
+import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jdbc.core.mapping.AggregateReference;
+import org.springframework.data.repository.ListCrudRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.Set;
+import java.util.stream.Collectors;
+
+@Service
+@Data
+@Slf4j
+public class UpdateSquadDataService implements UpdateDataService<UpdateSquadRequest> {
+
+    private final TournamentRepository tournamentRepository;
+    private final PictureRepository pictureRepository;
+    private final PictureFormatRepository pictureFormatRepository;
+    private final ListCrudRepository<SquadEntity, Long> squadRepository;
+
+    @Override
+    public Long update(UpdateSquadRequest request) throws ApplicationException {
+        SquadEntity squadEntity = new SquadEntity();
+        squadEntity.setName(request.getName());
+        squadEntity.setId(request.getSquadId());
+
+        Set<SquadBindingEntity> squadRefs = request.getUsersIds().stream()
+            .map(AggregateReference::<UserEntity, Long>to)
+            .map(it -> new SquadBindingEntity().setUserId(it))
+            .collect(Collectors.toSet());
+        squadEntity.setSquadUserRefs(squadRefs);
+
+        return squadRepository.save(squadEntity).getId();
+    }
+
+}

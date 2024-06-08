@@ -1,5 +1,7 @@
 package com.lelar.mapper;
 
+import com.lelar.dto.Gender;
+import com.lelar.dto.Status;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 
 import java.sql.Timestamp;
@@ -17,6 +19,22 @@ public interface CommonMapper {
 
     default Timestamp mapLocalDateTime(LocalDateTime localDateTime) {
         return Timestamp.valueOf(localDateTime);
+    }
+
+    default Gender mapGender(String gender) {
+        return Gender.getGenderByKey(gender);
+    }
+
+    default String mapGender(Gender gender) {
+        return gender.getGenderKey();
+    }
+
+    default String mapStatus(Status status) {
+        return status.name();
+    }
+
+    default Status mapStatus(String status) {
+        return Status.valueOf(status);
     }
 
 }

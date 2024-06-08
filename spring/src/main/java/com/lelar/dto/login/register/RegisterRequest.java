@@ -1,5 +1,6 @@
 package com.lelar.dto.login.register;
 
+import com.lelar.dto.Gender;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ public class RegisterRequest {
     private String firstName;
     private String secondName;
     private String patronymic;
+    private Gender gender;
     private LocalDateTime birthDate;
     private String username;
     private String password;

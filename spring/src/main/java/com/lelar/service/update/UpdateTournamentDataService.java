@@ -3,12 +3,14 @@ package com.lelar.service.update;
 import com.lelar.database.dao.PictureFormatRepository;
 import com.lelar.database.dao.PictureRepository;
 import com.lelar.database.dao.TournamentRepository;
+import com.lelar.database.dao.TournamentStatusRepository;
 import com.lelar.database.entity.PictureBindingEntity;
 import com.lelar.database.entity.PictureEntity;
 import com.lelar.database.entity.PictureFormatEntity;
 import com.lelar.database.entity.TournamentEntity;
+import com.lelar.database.entity.TournamentStatusEntity;
 import com.lelar.dto.picture.Picture;
-import com.lelar.dto.tournament.update.UpdateTournamentRequest;
+import com.lelar.dto.tournament.update.UpdateBeachTournamentRequest;
 import com.lelar.exception.ApplicationException;
 import com.lelar.mapper.PictureMapper;
 import com.lelar.mapper.TournamentMapper;
@@ -24,15 +26,16 @@ import java.util.stream.Collectors;
 
 @Service
 @Data
-public class UpdateTournamentDataService implements UpdateDataService<UpdateTournamentRequest> {
+public class UpdateTournamentDataService implements UpdateDataService<UpdateBeachTournamentRequest> {
 
     private final TournamentRepository tournamentRepository;
     private final PictureRepository pictureRepository;
     private final PictureFormatRepository pictureFormatRepository;
+    private final TournamentStatusRepository statusRepository;
 
     //TODO Отрефачить
     @Override
-    public void update(UpdateTournamentRequest request) throws ApplicationException {
+    public Long update(UpdateBeachTournamentRequest request) throws ApplicationException {
         //TODO Добавить проверку на формат картинки
 
         Set<Picture> pictures = request.getPictures();
@@ -60,7 +63,13 @@ public class UpdateTournamentDataService implements UpdateDataService<UpdateTour
             }
         ).collect(Collectors.toSet());
         entity.setTournamentPictureRefs(collect);
+
+        TournamentStatusEntity status = statusRepository.findByKey(request.getStatus().name());
+        entity.setStatusId(AggregateReference.to(status.getId()));
+
         tournamentRepository.save(entity);
+
+        return entity.getId();
     }
 
 }
