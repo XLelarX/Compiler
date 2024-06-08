@@ -26,7 +26,8 @@ Session-Id: sessionId
   "patronymic": "patronymic",
   "password": "qwerty12345",
   "birthDate": "1999-10-01T19:42:01",
-  "gender": "MALE"
+  "gender": "MALE",
+  "email": "e@MALE"
 }
 
 ###
@@ -76,6 +77,7 @@ Content-Type: application/json
 Session-Id: sessionId
 
 {
+  "tournamentId": 1,
   "tournamentName": "name",
   "startDate": "2020-10-01T00:00:00",
   "endDate": "2021-10-01T00:00:00",

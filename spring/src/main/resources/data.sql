@@ -1,15 +1,16 @@
-insert into users (first_name, second_name, patronymic, birth_date, gender, rating)
-values ('firstName', 'secondName', 'patrName', '1999-10-01', 'F', 1325),
-       ('thirdName', 'fourthName', 'patrName', '1989-10-01', 'M', 11);
+insert into users (first_name, second_name, patronymic, email, birth_date, gender, rating)
+values ('firstName', 'secondName', 'patrName', 'firstName@mail.ru','1999-10-01', 'F', 1325),
+       ('thirdName', 'fourthName', 'patrName', 'fourthName@gmail.com', '1989-10-01', 'M', 11);
 
 insert into logins
 values (next value for seq_pk_login_id, 'lelar', 'qwerty12345', 1),
        (next value for seq_pk_login_id, 'qwerty', 'qwerty12345', 2);
 
 insert into permissions
-values (next value for seq_pk_permission_id, 'Permission 1', 'permission.key.first', false),
-       (next value for seq_pk_permission_id, 'Permission 2', 'permission.key.second', true),
-       (next value for seq_pk_permission_id, 'Permission 3', 'permission.key.third', true);
+values (next value for seq_pk_permission_id, 'Обновление классических турниров', 'classic.tournament.update', false),
+       (next value for seq_pk_permission_id, 'Обновление пляжных турниров', 'beach.tournament.update', false),
+       (next value for seq_pk_permission_id, 'Обновление команд для пляжных турниров', 'beach.tournament.squad.update', false),
+       (next value for seq_pk_permission_id, 'Обновление картинок', 'picture.update', false);
 
 insert into squads
 values (next value for seq_pk_squad_id, 'firstSquad'),

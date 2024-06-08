@@ -5,11 +5,12 @@ import com.lelar.dto.login.User;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Accessors(chain = true)
 public class SessionData {
+    private long ttl;
     private User userData;
-    private List<Permission> permissions;
+    private Set<Permission> permissions;
 }

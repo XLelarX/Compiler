@@ -6,11 +6,11 @@ import com.lelar.database.entity.PictureBindingEntity;
 import com.lelar.database.entity.PictureEntity;
 import com.lelar.database.entity.TournamentEntity;
 import com.lelar.dto.picture.Picture;
-import com.lelar.dto.tournament.Tournament;
+import com.lelar.dto.tournament.beach.get.Tournament;
 import com.lelar.dto.tournament.classic.get.ClassicTournament;
 import com.lelar.dto.tournament.classic.update.UpdateClassicTournamentRequest;
-import com.lelar.dto.tournament.get.GetTournamentDetailResponse;
-import com.lelar.dto.tournament.update.UpdateBeachTournamentRequest;
+import com.lelar.dto.tournament.beach.get.GetTournamentDetailResponse;
+import com.lelar.dto.tournament.beach.update.UpdateBeachTournamentRequest;
 import com.lelar.instance.PictureInstance;
 import com.lelar.instance.TournamentInstance;
 import org.mapstruct.Mapper;
@@ -33,8 +33,10 @@ public interface TournamentMapper extends CommonMapper {
 
     Tournament map(TournamentEntity entity);
 
+    @Mapping(target = "id", source = "tournamentId")
     TournamentEntity map(UpdateBeachTournamentRequest request);
 
+    @Mapping(target = "id", source = "tournamentId")
     ClassicTournamentEntity mapClassic(UpdateClassicTournamentRequest request);
 
     Picture map(PictureEntity entity);

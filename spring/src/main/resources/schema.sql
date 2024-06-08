@@ -42,6 +42,7 @@ create table if not exists users
     first_name  varchar(255) not null,
     second_name varchar(255) not null,
     patronymic  varchar(255) not null,
+    email       varchar(255) not null,
     birth_date  timestamp    not null,
     gender      varchar(1)   not null,
     rating      number                default 0,

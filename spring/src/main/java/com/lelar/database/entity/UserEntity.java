@@ -12,6 +12,7 @@ import java.sql.Timestamp;
 import java.util.Set;
 
 import static com.lelar.database.entity.UserEntity.Names.BIRTH_DATE;
+import static com.lelar.database.entity.UserEntity.Names.EMAIL;
 import static com.lelar.database.entity.UserEntity.Names.FIRST_NAME;
 import static com.lelar.database.entity.UserEntity.Names.GENDER;
 import static com.lelar.database.entity.UserEntity.Names.PATRONYMIC;
@@ -34,6 +35,9 @@ public class UserEntity extends IdentifierEntity {
 
     @Column(PATRONYMIC)
     private String patronymic;
+
+    @Column(EMAIL)
+    private String email;
 
     @Column(BIRTH_DATE)
     private Timestamp birthDate;
@@ -60,6 +64,7 @@ public class UserEntity extends IdentifierEntity {
         String FIRST_NAME = "FIRST_NAME";
         String SECOND_NAME = "SECOND_NAME";
         String PATRONYMIC = "PATRONYMIC";
+        String EMAIL = "EMAIL";
         String BIRTH_DATE = "BIRTH_DATE";
         String RATING = "RATING";
         String GENDER = "GENDER";

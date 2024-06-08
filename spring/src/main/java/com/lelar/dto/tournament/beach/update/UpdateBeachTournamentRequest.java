@@ -1,4 +1,4 @@
-package com.lelar.dto.tournament.classic.update;
+package com.lelar.dto.tournament.beach.update;
 
 import com.lelar.dto.Gender;
 import com.lelar.dto.tournament.UpdateTournamentBase;
@@ -11,9 +11,9 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 @Data
-public class UpdateClassicTournamentRequest extends UpdateTournamentBase {
-    private String squadName;
-    private String opponentsSquadName;
+public class UpdateBeachTournamentRequest extends UpdateTournamentBase {
+    private Long squadId;
+    private Long opponentsSquadId;
 
     private String tournamentName;
     private LocalDateTime startDate;

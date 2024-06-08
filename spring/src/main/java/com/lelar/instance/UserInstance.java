@@ -12,4 +12,5 @@ public class UserInstance {
     private String gender;
     private LocalDateTime birthDate;
     private Long rating;
+    private String email;
 }
